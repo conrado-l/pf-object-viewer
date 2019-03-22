@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import ObjectsList from './components/TheObjectList.vue'
+import NotFound from './views/NotFound.vue'
 
 Vue.use(Router)
 
@@ -23,6 +24,10 @@ export default new Router({
       path: '/:id',
       name: 'object-detail',
       component: () => import(/* webpackChunkName: "object-detail" */ './views/ObjectDetail.vue')
+    },
+    {
+      path: '*',
+      component: NotFound
     }
   ]
 })

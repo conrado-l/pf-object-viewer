@@ -34,7 +34,7 @@ const state = initialState()
 
 const getters = {
   /**
-   * Generates an object containing the current pagination, sorting and filter settings
+   * Generates an object containing the current pagination, sorting and filter settings.
    * @param {object} state
    */
   getSettingsObjectParams (state) {
@@ -166,7 +166,7 @@ const actions = {
 
       get(URL)
         .then((res) => {
-          commit(types.SET_OBJECTS, res.data) // TODO: change to res.data.objects when pagination is added
+          commit(types.SET_OBJECTS, res.data.objects)
           // commit('setPaginationData', res.data.pagination)
           resolve()
         })
