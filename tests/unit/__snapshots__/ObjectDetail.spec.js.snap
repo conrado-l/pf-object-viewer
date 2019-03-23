@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ObjectDetail.vue should render the component correctly 1`] = `
+<v-layout-stub
+  tag="div"
+>
+  <v-flex-stub
+    md4=""
+    offset-md4=""
+    tag="div"
+    xs12=""
+  >
+    <card-detail-stub
+      errormessage="An error has occurred with the object detail."
+      items="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+      title="Object detail"
+    />
+     
+    <!---->
+  </v-flex-stub>
+</v-layout-stub>
+`;

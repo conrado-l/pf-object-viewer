@@ -1,4 +1,4 @@
-# pf-object-renderer
+# PF Object Viewer
 
 ## Considerations
 
@@ -17,6 +17,8 @@ passed as a prop from the ObjectList, it won't work.
 
 * TODO: Considerations on using Vuex for handling paging, filtering and sorting
 
+* TODO: Considerations over data poll from a store, avoid having 2 sources of truth
+
 * TODO: Consideration over accesing state and getters that generate overhead
 
 * TODO: Use of commit and skipping actions for synchronous state operations, avoid verbosity for small apps
@@ -24,6 +26,16 @@ passed as a prop from the ObjectList, it won't work.
 * TODO: Considerations of vue-wait and the pros
 
 * TODO: Considerations on patterns for updating vuex based on URL as single source of truth
+
+* TODO: Considerations on Docker and NPM if install fails: `npm cache clean --force
+                                          rm -rf ~/.npm
+                                          # In the project folder:
+                                          rm -rf node_modules
+                                          rm -f package-lock.json`
+                                          
+* Why its great to use data-test attributes for testing: 
+ https://medium.com/@colecodes/test-your-dom-with-data-attributes-44fccc43ed4b  
+ https://kentcdodds.com/blog/making-your-ui-tests-resilient-to-change                                       
 ## Project setup
 ```
 npm install

@@ -1,6 +1,6 @@
 <template>
   <v-toolbar dark color="primary">
-    <v-toolbar-title class="white--text">Object renderer</v-toolbar-title>
+    <v-toolbar-title class="white--text"> PF - Object Viewer</v-toolbar-title>
 
     <v-spacer></v-spacer>
 

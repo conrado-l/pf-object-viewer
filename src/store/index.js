@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import objectsList from './modules/objects-list'
+import objectDetail from './modules/object-detail'
 
 Vue.use(Vuex)
 
 const modules = {
-  objectsList
+  objectsList,
+  objectDetail
 }
 
 export default new Vuex.Store({

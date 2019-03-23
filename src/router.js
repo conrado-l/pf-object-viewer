@@ -16,13 +16,14 @@ export default new Router({
       component: Home
     },
     { // TODO: create a father route and /list, /:id as children maybe
-      path: '/list',
+      path: '/objects/list',
       name: 'objects-list',
       component: ObjectsList
     },
     {
-      path: '/:id',
+      path: '/objects/:id',
       name: 'object-detail',
+      props: true,
       component: () => import(/* webpackChunkName: "object-detail" */ './views/ObjectDetail.vue')
     },
     {

@@ -1,4 +1,6 @@
 import types from './objects-list.mutations'
+import filterTypes from '@/consts/filter-types'
+import sortTypes from '@/consts/sort-types'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
 import { generateURLQueryFromObject } from '@/utils/url'
@@ -8,19 +10,27 @@ const initialState = () => ({
   objects: [],
   filtering: {
     term: '',
-    selected: 'name',
-    options: [
-      { value: 'name', description: 'Name' },
-      { value: 'description', description: 'Description' },
-      { value: 'id', description: 'ID' }
-    ]
+    type: {
+      selected: filterTypes.types.NAME,
+      options: [
+        { value: filterTypes.types.NAME, description: 'Name' },
+        { value: filterTypes.types.DESCRIPTION, description: 'Description' },
+        { value: filterTypes.types.ID, description: 'ID' }
+      ]
+    },
+    available: {
+      selected: filterTypes.available.ALL,
+      options: [
+        { value: filterTypes.available.ALL, description: 'All' },
+        { value: filterTypes.available.AVAILABLE, description: 'Yes' },
+        { value: filterTypes.available.NOT_AVAILABLE, description: 'No' }]
+    }
   },
   sorting: {
-    selected: 'description',
+    selected: sortTypes.CREATION_DATE,
     options: [
-      { value: 'name', description: 'Name' },
-      { value: 'description', description: 'Description' },
-      { value: 'id', description: 'ID' }
+      { value: sortTypes.CREATION_DATE, description: 'Creation date' },
+      { value: sortTypes.ID, description: 'ID' }
     ]
   },
   pagination: {
@@ -43,7 +53,8 @@ const getters = {
     params.page = state.pagination.current
     params.limit = state.pagination.limit
     params.sortBy = state.sorting.selected
-    params.filterBy = state.filtering.selected
+    params.filterType = state.filtering.type.selected
+    params.available = state.filtering.available.selected
 
     if (state.filtering.term) {
       params.search = state.filtering.term
@@ -89,12 +100,20 @@ const mutations = {
     state.filtering.term = term
   },
   /**
-   * Sets the filter type
+   * Sets the type filter
    * @param state
    * @param {string} filter
    */
   [types.SET_FILTER_TYPE] (state, filter) {
-    state.filtering.selected = filter
+    state.filtering.type.selected = filter
+  },
+  /**
+   * Sets the available filter
+   * @param state
+   * @param {string} filter
+   */
+  [types.SET_FILTER_AVAILABLE] (state, filter) {
+    state.filtering.available.selected = filter
   },
   /**
    * Sets the sorting
@@ -102,20 +121,21 @@ const mutations = {
    * @param {string} sortBy
    */
   [types.SET_SORT_BY] (state, sortBy) {
-    state.sortBy = sortBy
+    state.sorting.selected = sortBy
   },
   /**
    * Sets the pagination, sorting and filter settings.
    * @param {object} state - Vuex state object.
    * @param {object} payload - Settings
    * @param {string} [payload.search] - Filter term
-   * @param {string} [payload.filterBy] - Filter type
+   * @param {string} [payload.filterType] - Filter type
    * @param {string} [payload.sortBy] - Sorting type
    * @param {string} [payload.page] - Page number
    */
-  [types.SET_SETTINGS] (state, { search, filterBy, sortBy, page }) {
+  [types.SET_SETTINGS] (state, { search, filterType, available, sortBy, page }) {
     state.filtering.term = search || state.filtering.term
-    state.filtering.selected = filterBy || state.filtering.selected // TODO: check if the filter is valid
+    state.filtering.type.selected = filterType || state.filtering.type.selected // TODO: check if the filter is valid
+    state.filtering.available.selected = available || state.filtering.available.selected // TODO: check if the filter is valid
     state.sorting.selected = sortBy || state.sorting.selected // TODO: check if the sort is valid
     state.pagination.selected = page ? Number(page) : state.pagination.selected
   },
