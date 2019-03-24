@@ -8,10 +8,30 @@ import { unixtimeToShortDate } from '@/utils/dates'
 describe('ObjectDetail.vue', () => {
   Vue.use(Vuetify) // Vuetify issue with createLocalVue: https://github.com/vuetifyjs/vuetify/issues/4964
 
+  const mockupObject = {
+    available: false,
+    creation_date: 1553276681,
+    description: 'An amazing blue shirt',
+    id: '125',
+    name: 'Shirt',
+    type: 'clothing'
+  }
+
+  const store = new Store({
+    state: {
+      objectDetail: {
+        object: mockupObject
+      }
+    },
+    getters: {
+      'objectDetail/getObject': mockupObject
+    }
+  })
+
   const factoryShallowMount = (props, loading = false) => {
     return shallowMount(ObjectDetail, {
       propsData: {
-        id: '125',
+        id: mockupObject.id,
         ...props
       },
       mocks: {
@@ -25,28 +45,8 @@ describe('ObjectDetail.vue', () => {
     })
   }
 
-  const mockupObjectData = {
-    available: false,
-    creation_date: 1553276681,
-    description: 'An amazing blue shirt',
-    id: '17',
-    name: 'Shirt',
-    type: 'clothing'
-  }
-
-  const store = new Store({
-    state: {
-      objectDetail: {
-        object: mockupObjectData
-      }
-    },
-    getters: {
-      'objectDetail/getObject': mockupObjectData
-    }
-  })
-
   beforeEach(() => {
-    store.dispatch = jest.fn().mockReturnValue(Promise.resolve(42)) // dispatch has to return a promise
+    store.dispatch = jest.fn().mockResolvedValue('data') // dispatch has to return a promise
   })
 
   afterEach(() => {
@@ -74,7 +74,7 @@ describe('ObjectDetail.vue', () => {
   it('should dispatch fetchObject action with the object id as payload', () => {
     factoryShallowMount()
 
-    expect(store.dispatch).toHaveBeenCalledWith('objectDetail/fetchObject', '125')
+    expect(store.dispatch).toHaveBeenCalledWith('objectDetail/fetchObject', mockupObject.id)
   })
 
   it('should return an empty array if getObject getter is not set yet from the objectDetail computed property', () => {
@@ -105,7 +105,7 @@ describe('ObjectDetail.vue', () => {
   })
 
   it('should dispatch fetchObject action and set error to true if the action fails', () => {
-    // store.dispatch = jest.fn().mockReturnValue(Promise.reject(42))
+    // store.dispatch = jest.fn().mockRejectedValue('data')
     //
     // const wrapper = factoryShallowMount()
     // wrapper.vm.$nextTick(() => {

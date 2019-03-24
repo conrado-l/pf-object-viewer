@@ -35,7 +35,9 @@ passed as a prop from the ObjectList, it won't work.
                                           
 * Why its great to use data-test attributes for testing: 
  https://medium.com/@colecodes/test-your-dom-with-data-attributes-44fccc43ed4b  
- https://kentcdodds.com/blog/making-your-ui-tests-resilient-to-change                                       
+ https://kentcdodds.com/blog/making-your-ui-tests-resilient-to-change     
+ 
+ * Great and funny video about mock testing by Justin Searls: https://www.youtube.com/watch?v=Af4M8GMoxi4                                  
 ## Project setup
 ```
 npm install

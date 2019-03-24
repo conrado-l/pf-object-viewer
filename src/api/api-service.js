@@ -2,8 +2,6 @@
  * Abstract API call handling
  */
 
-const HTTPService = window.axios // Can be easily replaced in the future
-
 /**
  * Sends a GET request
  * @param {string} url
@@ -20,5 +18,5 @@ export function get (url) {
  * @returns {Promise<any>}
  */
 export function post (url, params) {
-  return HTTPService.get(url, params)
+  return window.axios.post(url, params)
 }

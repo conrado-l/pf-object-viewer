@@ -15,7 +15,7 @@
     </v-flex>
 
     <v-flex v-else key="items">
-      <!--Only a v-card-text component should be used per card?!-->
+      <!--TODO: Only a v-card-text component should be used per card?!-->
       <v-card-text v-if="error"
                    class="error--text text-xs-center"
                    data-test="text-error-message">

@@ -21,16 +21,16 @@ Vue.use(VueMoment)
 Vue.use(Transitions)
 
 /** Error handler **/
-// Vue.config.errorHandler = (err, vm, info) => { // eslint-disable-line
+/* Vue.config.errorHandler = (err, vm, info) => { // eslint-disable-line
 // Store and send errors with Sentry or Bugsnag for example
 // Use a file like ./error-handling.js
-// }
+} */
 
 /** Warning handler **/
-// Vue.config.warnHandler = (msg, vm, trace) => {
+/* Vue.config.warnHandler = (msg, vm, trace) => {
 // Store and send warnings with Sentry or Bugsnag for example
 // Use a file like ./warning-handling.js
-// }
+} */
 
 /** Vue instance */
 new Vue({

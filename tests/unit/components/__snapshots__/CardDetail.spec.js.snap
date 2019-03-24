@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CardDetail.vue should render the component correctly 1`] = `
+<v-card-stub
+  tag="div"
+>
+  <v-card-title-stub
+    class="headline"
+    data-test="text-title"
+    text-xs-center=""
+  >
+    
+    Title
+  
+  </v-card-title-stub>
+   
+  <v-flex-stub
+    tag="div"
+  >
+    <!---->
+     
+  </v-flex-stub>
+</v-card-stub>
+`;
