@@ -8,5 +8,8 @@ export default {
 
     commit('SET_OBJECTS', objectsData)
     commit('SET_TOTAL_PAGES', 3)
+  },
+  applySettings ({ commit }, settings) {
+    commit('SET_SETTINGS', settings)
   }
 }

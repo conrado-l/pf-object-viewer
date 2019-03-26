@@ -1,5 +1,5 @@
 <template>
-  <v-layout justify-center>
+  <v-layout justify-center data-app>
     <v-flex xs12 sm5 mx-2>
       <v-layout justify-center>
         <v-flex xs12 md4 mx-2>
@@ -9,6 +9,7 @@
                   v-model="filterSearch"
                   solo
                   clearable
+                  data-test="input-search"
           >
           </v-text-field>
         </v-flex>
@@ -23,6 +24,7 @@
                   item-value="value"
                   solo
                   clearable
+                  data-test="input-filter-type"
           >
           </v-select>
         </v-flex>
@@ -39,6 +41,7 @@
                   item-value="value"
                   solo
                   clearable
+                  data-test="input-filter-availability"
           >
           </v-select>
         </v-flex>
@@ -53,6 +56,8 @@
                   clearable
                   solo
                   multiple
+                  data-test="input-sorting"
+
           >
           </v-select>
         </v-flex>
@@ -95,6 +100,7 @@
                 :disabled="isLoading"
                 @input="updatePagination"
                 circle
+                data-test="input-pagination"
         ></v-pagination>
       </v-layout>
     </v-flex>
@@ -104,7 +110,7 @@
 
 <script>
 /***
-   * This was my first idea for the functionality. I used the single Vuetify components + Vuex.
+   * This was my first idea and approach for the functionality. I used the single Vuetify components + Vuex.
    * I decided to go for single Vuetify components + Vuex because the model management is much better and the code
    * is better organized and cleaner.
    * It also enables other components (if that was the case) to access the objects, pagination, filters and sorting.
@@ -134,7 +140,6 @@ export default {
     }
   },
   created () {
-    this.hydrateSettingsFromURL()
     // this.startFetchObjectPolling(10000)
   },
   methods: {
@@ -142,7 +147,7 @@ export default {
        * Sets the pagination, sorting, and filtering settings from the URL.
        */
     hydrateSettingsFromURL () {
-      this.$store.commit('objectsList/SET_SETTINGS', this.$route.query)
+      this.$store.dispatch('objectsList/applySettings', this.$route.query)
     },
     /**
        * Fetches the objects with the associated settings.

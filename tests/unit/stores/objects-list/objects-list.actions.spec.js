@@ -1,5 +1,5 @@
 import actions from './objects-list.actions'
-import { generateURLQueryFromObject } from '../../../../src/utils/url'
+import { generateURLQueryFromObject } from '@/utils/url'
 
 let url = ''
 
@@ -17,7 +17,7 @@ describe('fetchObjects', () => {
     const commit = jest.fn()
     const query = {
       page: 1,
-      limit: 5,
+      limit: 5, // TODO: set it the store only?
       search: 'pf',
       filterBy: 'description',
       sortBy: 'id',
@@ -31,5 +31,22 @@ describe('fetchObjects', () => {
     expect(url).toBe(`${process.env.VUE_APP_BASE_API_URL}/objects${serializedQuery}`)
     expect(commit).toHaveBeenCalledWith('SET_OBJECTS', true)
     expect(commit).toHaveBeenCalledWith('SET_TOTAL_PAGES', 3)
+  })
+})
+describe('applySettings', () => {
+  it('should apply the settings by calling the SET_SETTINGS mutation', async () => {
+    const commit = jest.fn()
+    const settings = {
+      page: 1,
+      limit: 5,
+      search: 'pf',
+      filterBy: 'description',
+      sortBy: 'id',
+      available: 'no'
+    }
+
+    actions.applySettings({ commit }, settings) // Synchronous action, no need for await
+
+    expect(commit).toHaveBeenCalledWith('SET_SETTINGS', settings)
   })
 })

@@ -32,3 +32,25 @@ describe('SET_OBJECTS', () => {
     })
   })
 })
+
+describe('SET_SETTINGS', () => {
+  it('should set settings to the store', () => {
+    const settings = {
+      page: 1,
+      search: 'pf',
+      filterBy: 'description',
+      sortBy: 'id',
+      available: 'no'
+    }
+
+    const state = {
+      objects: null
+    }
+
+    mutations.SET_SETTINGS(state, settings) // TODO: finish test
+
+    // expect(state).toEqual({
+    //   objects: mockupObjects
+    // })
+  })
+})

@@ -203,6 +203,15 @@ const actions = {
         })
         .finally(() => dispatch('wait/end', loaderName, { root: true }))
     })
+  },
+  /**
+   * Sets the settings for pagination, sorting and filtering.
+   * @param commit
+   * @param {object} settings
+   * Consideration: the mutation could be called without an action, depending on the person.
+   */
+  applySettings ({ commit }, settings) {
+    commit(types.SET_SETTINGS, settings)
   }
 }
 

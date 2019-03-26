@@ -44,6 +44,9 @@ for sorting in Vuetify, there is a hacky way: https://codepen.io/grishnyakov/pen
 * TODO: considerations on using TreeView for the object detail
 
 * TODO: considerations on router-link tag tr not being to be clicked as an <a>
+
+* TODO: I learned about how some things worked in Vuetify by looking at their tests:
+https://github.com/vuetifyjs/vuetify/tree/master/packages/vuetify/test/unit/components
 ## Project setup
 ```
 npm install

@@ -6,8 +6,6 @@ import { Store } from 'vuex-mock-store'
 import { unixtimeToShortDate } from '@/utils/dates'
 
 describe('ObjectDetail.vue', () => {
-  Vue.use(Vuetify) // Vuetify issue with createLocalVue: https://github.com/vuetifyjs/vuetify/issues/4964
-
   const mockupObject = {
     available: false,
     creation_date: 1553276681,
@@ -46,6 +44,7 @@ describe('ObjectDetail.vue', () => {
   }
 
   beforeEach(() => {
+    Vue.use(Vuetify) // Vuetify issue with createLocalVue: https://github.com/vuetifyjs/vuetify/issues/4964
     store.dispatch = jest.fn().mockResolvedValue('data') // dispatch has to return a promise
   })
 
