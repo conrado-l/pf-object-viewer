@@ -1,5 +1,5 @@
 export default {
-  getObjects: (state) => {
-    return state.objects
+  getObject: (state) => {
+    return state.object
   }
 }

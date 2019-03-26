@@ -1,30 +1,20 @@
 import getters from './object-detail.getters'
 
-const objects = [
-  {
-    available: false,
-    creation_date: 1553276681,
-    description: 'An amazing blue shirt',
-    id: '125',
-    name: 'Shirt',
-    type: 'clothing'
-  },
-  {
-    available: true,
-    creation_date: 1553276685,
-    description: 'An amazing red shirt',
-    id: '126',
-    name: 'Shirt',
-    type: 'clothing'
-  }
-]
+const object = {
+  available: true,
+  creation_date: 1553276685,
+  description: 'An amazing red shirt',
+  id: '126',
+  name: 'Shirt',
+  type: 'clothing'
+}
 
-const state = { objects }
+const state = { object }
 
-describe('getObjects', () => {
-  it('it should return the objects', () => {
-    const actual = getters.getObjects(state)
+describe('getObject', () => {
+  it('it should return the object', () => {
+    const actual = getters.getObject(state)
 
-    expect(actual).toEqual(objects)
+    expect(actual).toEqual(object)
   })
 })

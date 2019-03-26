@@ -11,7 +11,7 @@
             py-3
             key="loader"
             data-test="loader">
-      <v-progress-circular :indeterminate="true"></v-progress-circular>
+      <v-progress-circular color="blue" :indeterminate="true"></v-progress-circular>
     </v-flex>
 
     <v-flex v-else key="items">
@@ -21,7 +21,7 @@
                    data-test="text-error-message">
         {{errorMessage}}
       </v-card-text>
-      <v-card-text v-for="(item) in items"
+      <v-card-text v-for="item in items"
                    :key="item.id"
                    data-test="text-item">
         {{item.description}}: {{item.value}}

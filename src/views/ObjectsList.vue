@@ -1,48 +1,160 @@
 <template>
   <v-layout justify-center>
+    <v-flex xs12 sm5 mx-2>
+      <v-layout justify-center>
+        <v-flex xs12 md4 mx-2>
+          <v-text-field
+                  name="search"
+                  label="Search filter"
+                  v-model="filterSearch"
+                  solo
+                  clearable
+          >
+          </v-text-field>
+        </v-flex>
+
+        <v-flex xs12 md4 mx-2>
+          <v-select
+                  name="filterType"
+                  label="Filter type"
+                  v-model="filterType"
+                  :items="getFilters.byTerm.options"
+                  item-text="description"
+                  item-value="value"
+                  solo
+                  clearable
+          >
+          </v-select>
+        </v-flex>
+
+      </v-layout>
+      <v-layout justify-center>
+        <v-flex xs12 md4 mx-2>
+          <v-select
+                  name="available"
+                  label="Available"
+                  v-model="filterAvailable"
+                  :items="getFilters.byAvailability.options"
+                  item-text="description"
+                  item-value="value"
+                  solo
+                  clearable
+          >
+          </v-select>
+        </v-flex>
+        <v-flex xs12 md6 mx-2>
+          <v-select
+                  name="sortBy"
+                  label="Sort by"
+                  v-model="sorting"
+                  :items="getSorting.options"
+                  item-text="description"
+                  item-value="value"
+                  clearable
+                  solo
+                  multiple
+          >
+          </v-select>
+        </v-flex>
+      </v-layout>
+      <v-card>
+        <v-card-title class="headline">
+          Objects List
+        </v-card-title>
+
+        <v-spacer></v-spacer>
+
+        <v-data-table
+                :headers="headers"
+                :items="objects"
+                :loading="isLoading"
+                disable-initial-sort
+                hide-actions
+        >
+          <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
+
+          <template v-slot:items="items">
+            <router-link tag="tr"
+                         :to="{name: 'object-detail', params: {id: items.item.id}}"
+                         title="Go to detail"
+                         :key="items.item.id"
+                         :data-test="`item-${items.item.id}`"
+            >
+              <td v-for="(property, index) in items.item" :key="`tabledata-${property}-${index}`">{{ property }}</td>
+            </router-link>
+          </template>
+
+        </v-data-table>
+
+      </v-card>
+      <v-layout align-center justify-center my-2>
+        <v-pagination
+                :value="getPagination.current"
+                :length="getPagination.totalPages"
+                :total-visible="4"
+                :disabled="isLoading"
+                @input="updatePagination"
+                circle
+        ></v-pagination>
+      </v-layout>
+    </v-flex>
+
   </v-layout>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import types from '@/store/modules/objects-list.mutations'
+/***
+   * This was my first idea for the functionality. I used the single Vuetify components + Vuex.
+   * I decided to go for single Vuetify components + Vuex because the model management is much better and the code
+   * is better organized and cleaner.
+   * It also enables other components (if that was the case) to access the objects, pagination, filters and sorting.
+   * In my opinion Vuex (sometimes) should be used in medium to large apps for avoiding to refactor from local state to Vuex later.
+   * Vuex is not a silver bullet, and it's not always the right tool, but "Use Vuex before is too late".
+   */
+import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
-
-// Not declared in data () since its a non-reactive constant
-const storeNamespace = 'objectsList'
 
 export default {
   name: 'ObjectList',
   data () {
     return {
-      pollingInterval: null
+      pollingInterval: null,
+      headers: [
+        {
+          text: 'ID',
+          align: 'left',
+          sortable: false,
+          value: 'id'
+        },
+        { text: 'Name', sortable: false, value: 'name' },
+        { text: 'Description', sortable: false, value: 'description' },
+        { text: 'Type', sortable: false, value: 'type' },
+        { text: 'Available', sortable: false, value: 'available' }
+      ]
     }
   },
   created () {
-    this.setSettingsFromURL()
-    this.setInitialRoute()
-    this.fetchObjects()
-    this.subscribeToInputMutations()
+    this.hydrateSettingsFromURL()
     // this.startFetchObjectPolling(10000)
   },
   methods: {
-    // Sets the pagination, sorting, and filtering settings from the URL to Vuex.
-    setSettingsFromURL () {
-      this.$store.commit(`${storeNamespace}/${types.SET_SETTINGS}`, this.$route.query)
-    },
-    // Fetches the objects taking the settings from Vuex.
-    fetchObjects () {
-      this.$store.dispatch('objectsList/fetchObjects')
-    },
-    // Sets the initial route
-    setInitialRoute () {
-      this.$router.replace({
-        name: 'objects-list',
-        query: this.getSettingsObjectParams
-      })
+    /**
+       * Sets the pagination, sorting, and filtering settings from the URL.
+       */
+    hydrateSettingsFromURL () {
+      this.$store.commit('objectsList/SET_SETTINGS', this.$route.query)
     },
     /**
-       * Starts the interval for polling the objects data every X seconds
+       * Fetches the objects with the associated settings.
+       */
+    fetchObjects () {
+      this.$store.dispatch('objectsList/fetchObjects')
+        .catch(() => {
+          // Show toast or text error in the table
+        })
+    },
+    /**
+       * Starts the interval for polling the objects data every X seconds.
        * @param {number} interval Interval in milliseconds
        */
     startFetchObjectPolling (interval) {
@@ -50,55 +162,116 @@ export default {
         this.fetchObjects()
       }, interval) // TODO: let the user set the interval or get it from a config/ENV
     },
-    // Pushes the new route for allowing the user to go back and forward (browser history) and triggers fetch on watch.
-    updateRouteStateAndParams () {
+    /**
+       * Pushes the new route with the updated params, triggers route watch and allows the user to go back and forward.
+       * @param {string} name Input name
+       * @param {string} value Input value
+       */
+    updateRoute (name, value) {
+      // Create a new object from the router query and add a new property to it for the new/updated value
+      // If the value is falsy, set it to undefined so vue-router will delete it automatically (can be improved)
+      // https://github.com/vuejs/vue-router/pull/1568
+      const query = Object.assign({}, this.$route.query, { [name]: value || undefined })
+
       this.$router.push({
         name: 'objects-list',
-        query: this.getSettingsObjectParams
+        query
       })
     },
-    // Update the route if a user relevant input mutation is applied.
-    subscribeToInputMutations () { // TODO: refactor and improve the function and the mutation names/namespaces
-      this.$store.subscribe((mutation) => {
-        if ([
-          'objectsList/SET_FILTER_TERM',
-          'objectsList/SET_FILTER_TYPE',
-          'objectsList/SET_FILTER_AVAILABLE',
-          'objectsList/SET_SORT_BY',
-          'objectsList/SET_CURRENT_PAGE']
-          .some((type) => type === mutation.type)) {
-          this.updateRouteStateAndParams()
-        }
-      })
+    /**
+       * Pushes the new page to the router.
+       */
+    updatePagination (value) {
+      this.updateRoute('page', value)
     }
   },
   computed: {
-    // Indicates if there is a fetching operation at the moment.
+    /**
+       * v-model setters/getters for the inputs.
+       * Could also use :value and @input on every input instead but in this case I don't want to pollute the view with logic.
+       * Every input would need: @input="updateRoute('inputName', $event).
+       * Its a trade-off between polluting the view with boilerplate logic vs. having larger setter/getters methods.
+       **/
+    filterSearch: {
+      get () {
+        return this.getFilters.byTerm.search
+      },
+      set (value) {
+        this.updateRoute('search', value)
+      }
+    },
+    filterType: {
+      get () {
+        return this.getFilters.byTerm.selected
+      },
+      set (value) {
+        this.updateRoute('filterType', value)
+      }
+    },
+    filterAvailable: {
+      get () {
+        return this.getFilters.byAvailability.selected
+      },
+      set (value) {
+        this.updateRoute('available', value)
+      }
+    },
+    sorting: {
+      get () {
+        return this.getSorting.selected
+      },
+      set (value) {
+        this.updateRoute('sortBy', value)
+      }
+    },
+    /** *
+       * Indicates if there is a fetching operation at the moment.
+       */
     isLoading () {
       return this.$wait.is(loaders.objectsList.FETCH_OBJECTS)
     },
-    ...mapState(storeNamespace, [
-      'objects',
-      'filtering',
-      'sorting',
-      'pagination'
-    ]),
-    ...mapGetters(storeNamespace, [
-      'getSettingsObjectParams'
+    /**
+       * Computes the objects structure for showing in the table.
+       */
+    objects () {
+      if (!this.getObjects) {
+        return []
+      }
+
+      return this.getObjects.map(object => {
+        return {
+          id: object.id,
+          name: object.name,
+          description: object.description,
+          type: object.type,
+          available: object.available ? 'Yes' : 'No'
+        }
+      })
+    },
+    ...mapGetters('objectsList', [
+      'getObjects',
+      'getPagination',
+      'getFilters',
+      'getSorting'
     ])
   },
   /**
-     * When a new route is detected, the settings will be updated from the URL to Vuex, it will also fetch the objects.
+     * When a new route is detected, the settings will be hydrated from the URL and the objects will be fetched.
      * The URL is taken as the single source of truth in this case.
-     * beforeRouteUpdate hook could be used too, but there is no need to prevent navigation.
+     * beforeRouteUpdate hook could also be used, but there is no need to prevent navigation.
      */
   watch: {
-    '$route' () {
-      this.setSettingsFromURL()
-      this.fetchObjects()
+    '$route': {
+      immediate: true,
+      handler () {
+        this.hydrateSettingsFromURL()
+        this.fetchObjects()
+      }
     }
   },
-  // On component destroyal, it will clear the polling interval, avoiding memory leaks, it will also reset the store.
+  /**
+     * When the component is about the be destroyed, clear the interval, avoiding memory leaks and reset the store.
+     */
   beforeDestroy () {
     clearInterval(this.pollingInterval)
     this.$store.commit('objectsList/reset')

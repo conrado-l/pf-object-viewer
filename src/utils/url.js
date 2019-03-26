@@ -1,5 +1,5 @@
 /**
- * Generates a URL queries based on the object properties
+ * Generates a URL query based on the object properties
  * Example: Input {value: 1, name: 'George'} --> Output '?value=1&name=George'
  * @param {object} paramsObject
  */

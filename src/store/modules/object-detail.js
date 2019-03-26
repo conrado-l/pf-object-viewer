@@ -10,6 +10,11 @@ const initialState = () => ({
 const state = initialState()
 
 const getters = {
+  /**
+   * Gets the object detail
+   * @param state
+   * @returns {object}
+   */
   getObject: state => {
     return state.object
   }
@@ -38,7 +43,7 @@ const mutations = {
 
 const actions = {
   /**
-   * Fetches the objects
+   * Fetches the object detail
    * @param commit
    * @param dispatch
    * @param {number} objectId

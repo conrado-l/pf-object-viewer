@@ -1,7 +1,6 @@
 <template>
   <v-layout>
     <v-flex xs12 md4 offset-md4>
-
       <card-detail
               title="Object detail"
               :items="objectDetail"
@@ -28,6 +27,7 @@ export default {
   components: { CardDetail },
   props: {
     // Passed from the router (props: true)
+    // Other approach would be to create a variable "id" in data () and assign this.$route.params.id to it
     id: {
       type: String,
       required: true,
@@ -40,7 +40,9 @@ export default {
     }
   },
   methods: {
-    // Fetches the object detail with the associated id
+    /**
+     * Fetches the object detail with the associated id
+     */
     fetchObjectDetail () {
       this.$store.dispatch('objectDetail/fetchObject', this.id)
         .then(() => {
@@ -61,8 +63,11 @@ export default {
     this.fetchObjectDetail()
   },
   computed: {
-    // Generates the object detail with the associated description label
-    // TODO: the server could also send the label
+    /**
+     * Generates the object detail with the associated description label.
+     * @returns {object}
+     * CONSIDERATION: the server could also send the label but i18n should be server-side then
+     */
     objectDetail () {
       if (!this.getObject) {
         return []
@@ -77,7 +82,10 @@ export default {
         { description: 'Creation Date', value: unixtimeToShortDate(this.getObject.creation_date) }
       ]
     },
-    // Indicates if there is a fetching operation at the moment.
+    /**
+     * Indicates if there is a fetching operation at the moment.
+     * @returns {boolean}
+     */
     isLoading () {
       return this.$wait.is(loaders.objectDetail.FETCH_OBJECT_DETAIL)
     },

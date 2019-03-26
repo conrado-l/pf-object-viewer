@@ -1,6 +1,4 @@
 import types from './objects-list.mutations'
-import filterTypes from '@/consts/filter-types'
-import sortTypes from '@/consts/sort-types'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
 import { generateURLQueryFromObject } from '@/utils/url'
@@ -8,34 +6,36 @@ import { generateURLQueryFromObject } from '@/utils/url'
 // Keep the initial state in case we need to reset the store, when a component destroys for example.
 const initialState = () => ({
   objects: [],
-  filtering: {
-    term: '',
-    type: {
-      selected: filterTypes.types.NAME,
+  filters: {
+    byTerm: {
+      search: '', // Search term filter
+      selected: '',
       options: [
-        { value: filterTypes.types.NAME, description: 'Name' },
-        { value: filterTypes.types.DESCRIPTION, description: 'Description' },
-        { value: filterTypes.types.ID, description: 'ID' }
+        { value: 'name', description: 'Name' },
+        { value: 'description', description: 'Description' },
+        { value: 'id', description: 'ID' }
       ]
     },
-    available: {
-      selected: filterTypes.available.ALL,
+    byAvailability: {
+      selected: '',
       options: [
-        { value: filterTypes.available.ALL, description: 'All' },
-        { value: filterTypes.available.AVAILABLE, description: 'Yes' },
-        { value: filterTypes.available.NOT_AVAILABLE, description: 'No' }]
+        { value: 'yes', description: 'Yes' },
+        { value: 'no', description: 'No' }
+      ]
     }
   },
   sorting: {
-    selected: sortTypes.CREATION_DATE,
+    selected: '',
     options: [
-      { value: sortTypes.CREATION_DATE, description: 'Creation date' },
-      { value: sortTypes.ID, description: 'ID' }
+      { value: 'name', description: 'Name' },
+      { value: 'description', description: 'Description' },
+      { value: 'id', description: 'ID' }
     ]
   },
   pagination: {
     current: 1,
-    total: 5, // TODO: set by the API response
+    totalObjects: 5, // TODO: set by the API response
+    totalPages: 5, // TODO: set by the API response
     limit: 5 // TODO: set by the user?
   }
 })
@@ -44,20 +44,61 @@ const state = initialState()
 
 const getters = {
   /**
-   * Generates an object containing the current pagination, sorting and filter settings.
+   * Gets the objects
+   * @param state
+   * @returns {array}
+   */
+  getObjects (state) {
+    return state.objects
+  },
+  /**
+   * Gets the pagination settings
+   * @param state
+   * @returns {number}
+   */
+  getPagination (state) {
+    return state.pagination
+  },
+  /**
+   * Gets the filters settings
+   * @param state
+   * @returns {number}
+   */
+  getFilters (state) {
+    return state.filters
+  },
+  /**
+   * Gets the filters settings
+   * @param state
+   * @returns {number}
+   */
+  getSorting (state) {
+    return state.sorting
+  },
+  /**
+   * Generates an object containing the current pagination and the enabled sorting/filter settings.
    * @param {object} state
    */
-  getSettingsObjectParams (state) {
+  getCurrentSettings (state) {
     let params = {}
 
     params.page = state.pagination.current
     params.limit = state.pagination.limit
-    params.sortBy = state.sorting.selected
-    params.filterType = state.filtering.type.selected
-    params.available = state.filtering.available.selected
 
-    if (state.filtering.term) {
-      params.search = state.filtering.term
+    if (state.sorting.selected) {
+      params.sortBy = state.sorting.selected
+    }
+
+    if (state.filters.byTerm.selected) {
+      params.filterBy = state.filters.byTerm.selected
+    }
+
+    if (state.filters.byTerm.search) {
+      params.search = state.filters.byTerm.search
+    }
+
+    if (state.filters.byAvailability.selected) {
+      params.available = state.filters.byAvailability.selected
     }
 
     return params
@@ -67,7 +108,7 @@ const getters = {
 const mutations = {
   /**
    * Resets the store's state
-   * @param state
+   * @param state Vuex state
    */
   reset (state) {
     const init = initialState()
@@ -77,75 +118,39 @@ const mutations = {
   },
   /**
    * Sets the objects
-   * @param state
+   * @param state Vuex state
    * @param objects
    */
   [types.SET_OBJECTS] (state, objects) {
     state.objects = objects
   },
   /**
-   * Sets the current page
-   * @param state
-   * @param {string} page
-   */
-  [types.SET_CURRENT_PAGE] (state, page) {
-    state.pagination.current = page
-  },
-  /**
-   * Sets the filter term
-   * @param state
-   * @param {string} term
-   */
-  [types.SET_FILTER_TERM] (state, term) {
-    state.filtering.term = term
-  },
-  /**
-   * Sets the type filter
-   * @param state
-   * @param {string} filter
-   */
-  [types.SET_FILTER_TYPE] (state, filter) {
-    state.filtering.type.selected = filter
-  },
-  /**
-   * Sets the available filter
-   * @param state
-   * @param {string} filter
-   */
-  [types.SET_FILTER_AVAILABLE] (state, filter) {
-    state.filtering.available.selected = filter
-  },
-  /**
-   * Sets the sorting
-   * @param state
-   * @param {string} sortBy
-   */
-  [types.SET_SORT_BY] (state, sortBy) {
-    state.sorting.selected = sortBy
-  },
-  /**
    * Sets the pagination, sorting and filter settings.
-   * @param {object} state - Vuex state object.
-   * @param {object} payload - Settings
-   * @param {string} [payload.search] - Filter term
-   * @param {string} [payload.filterType] - Filter type
-   * @param {string} [payload.sortBy] - Sorting type
-   * @param {string} [payload.page] - Page number
+   * @param {object} state - Vuex state.
+   * @param {object} settings - Settings
+   * @param {string} [settings.search] - Filter term
+   * @param {string} [settings.filterType] - Filter type
+   * @param {string} [settings.sortBy] - Sorting type
+   * @param {string} [settings.available] - Availability filter
+   * @param {string} [settings.page] - Page number
+   * TODO: can be refactored into an action that fires a different mutation for every state property
    */
-  [types.SET_SETTINGS] (state, { search, filterType, available, sortBy, page }) {
-    state.filtering.term = search || state.filtering.term
-    state.filtering.type.selected = filterType || state.filtering.type.selected // TODO: check if the filter is valid
-    state.filtering.available.selected = available || state.filtering.available.selected // TODO: check if the filter is valid
-    state.sorting.selected = sortBy || state.sorting.selected // TODO: check if the sort is valid
-    state.pagination.selected = page ? Number(page) : state.pagination.selected
+  [types.SET_SETTINGS] (state, { search, page, filterType, sortBy, available }) { // TODO: check if URL filter/sort is valid
+    state.filters.byTerm.search = search || ''
+    state.filters.byTerm.selected = filterType || ''
+    state.filters.byAvailability.selected = available || ''
+    state.sorting.selected = sortBy || ''
+    state.pagination.current = page ? Number(page) : state.pagination.current
   },
   /**
-   * Sets the pagination settings.
-   * @param {object} state - Vuex state object.
-   * @param {string} total - Total page count.
+   * Sets the total pages for pagination.
+   * @param {object} state - Vuex state.
+   * @param {string} totalPages - Total page count.
+   * @param {string} totalObjects - Total objects count.
    */
-  [types.SET_PAGINATION_SETTINGS] (state, { total }) {
-    state.pagination.total = total ? Number(total) : state.pagination.total
+  [types.SET_PAGINATION_SETTINGS] (state, { totalPages, totalObjects }) {
+    state.pagination.totalPages = totalPages ? Number(totalPages) : state.totalPages
+    state.pagination.totalObjects = totalObjects ? Number(totalObjects) : state.totalObjects
   }
 }
 
@@ -182,12 +187,14 @@ const actions = {
     return new Promise((resolve, reject) => {
       dispatch('wait/start', loaderName, { root: true })
 
-      const URL = `/objects${generateURLQueryFromObject(getters.getSettingsObjectParams)}` // TODO: improve
+      const serializedQuery = generateURLQueryFromObject(getters.getCurrentSettings)
+
+      const URL = `/objects${serializedQuery}`
 
       get(URL)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data.objects)
-          // commit('setPaginationData', res.data.pagination)
+          // commit(types.SET_PAGINATION_SETTINGS, {totalPages: res.data.totalPages, totalObjects: res.data.totalObjects})
           resolve()
         })
         .catch((err) => {
