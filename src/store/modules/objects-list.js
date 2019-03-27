@@ -100,11 +100,7 @@ const getters = {
     }
 
     if (state.filters.byTerm.selected && state.filters.byTerm.search) {
-      params[state.filters.byTerm.selected] = state.filters.byTerm.search
-    }
-
-    if (state.filters.byTerm.search) {
-      // params.q = state.filters.byTerm.search
+      params[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
     }
 
     if (state.filters.byAvailability.selected) {
