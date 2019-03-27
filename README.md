@@ -68,7 +68,7 @@ Docker, even though I know the basics. I'm always learning and improving.
 
 ¡Thanks for reading and for the opportunity!
 
-# Trello dashboard progress
+### Trello dashboard progress
 https://trello.com/b/93A8QLtj/pf
 ### Installation
 * If Docker and NPM install fails: `npm cache clean --force
@@ -108,7 +108,7 @@ json-server objects.json
 
 It will listen in port 3000.
 
-## Docker setup
+# Docker setup
 
 ### Container build
 ```
@@ -117,13 +117,13 @@ sudo docker build -t pf-frontend .
 
 ### Run unit tests
 ```
-sudo docker run -it -p 80:80 --rm --name pf-frontend --build-arg run=test
+sudo docker run -it -p 8080:8080 --rm --name pf-frontend --build-arg run=test
 ```
 If anything goes wrong with Jest, run `jest --clearCache`
 
 ### Compiles, minifies and serves for production
 ```
-sudo docker run -it -p 80:80 --rm --name pf-frontend --build-arg run=build
+sudo docker run -it -p 8080:8080 --rm --name pf-frontend --build-arg run=build
 ```
 
 Disclaimer: warnings about core-js version are shown when running some commands, it's actually a Vue-CLI error and it was fixed 12 hours ago in 3.5.2 
@@ -131,7 +131,7 @@ Disclaimer: warnings about core-js version are shown when running some commands,
 
 Given that I'm not Docker expert (yet), the tests (once they pass) will try to serve and it will fail. I'm working on it.
 
-## Local setup (no Docker)
+# Local setup (no Docker)
 ```
 npm install
 ```
