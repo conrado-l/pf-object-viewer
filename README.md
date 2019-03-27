@@ -121,14 +121,18 @@ sudo docker build -t pf-frontend .
 
 ### Run unit tests
 ```
-sudo docker run -it -p 8080:8080 --rm --name pf-frontend-test pf-frontend --build-arg run=test
+sudo docker build -t pf-frontend-tests . --build-arg run=test
+sudo docker run -it -p 8080:8080 --rm --name pf-frontend-tests-v1 pf-frontend-tests
 ```
 If anything goes wrong with Jest, run `jest --clearCache`
 
-### Compiles, minifies and serves for production
+### Serves development server
 ```
-sudo docker run -it -p 8080:8080 --rm --name pf-frontend-build pf-frontend --build-arg run=build
+sudo docker build -t pf-frontend-app . --build-arg run=serve
+sudo docker run -it -p 8080:8080 --rm --name pf-frontend-app-v1 pf-frontend-app
 ```
+
+Available at: `http://localhost:8080`
 
 Disclaimer: warnings about core-js version are shown when running some commands, it's actually a Vue-CLI error and it was fixed 12 hours ago in 3.5.2 
             (I'm using 3.5.1 and I don't wanna risk a dirty update): https://github.com/vuejs/vue-cli/issues/3695

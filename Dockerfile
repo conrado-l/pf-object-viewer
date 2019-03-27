@@ -1,17 +1,13 @@
 # TODO: improve the whole file and build/test logic
-ARG run="build"
+ARG run="serve"
 
 # build stage
 FROM node:lts-alpine as build-stage
 WORKDIR /app
 COPY package.json ./
-RUN yarn install
+RUN yarn cache clean
+RUN yarn install --verbose
 COPY . .
 
-RUN if [ "$run" = "build" ] ; then yarn run build; else yarn run test:unit; fi
-
-# production stage
-FROM nginx:stable-alpine as production-stage
-COPY --from=build-stage /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+RUN if [ "$run" = "test" ] ; then yarn run test:unit; else yarn run serve; fi
+EXPOSE 8080
