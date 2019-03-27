@@ -8,8 +8,7 @@ COPY package.json ./
 RUN yarn install
 COPY . .
 
-RUN ls
-RUN if [ "$run" = "build" ] ; then RUN yarn run build; else yarn run test:unit; fi
+RUN if [ "$run" = "build" ] ; then yarn run build; else yarn run test:unit; fi
 
 # production stage
 FROM nginx:stable-alpine as production-stage

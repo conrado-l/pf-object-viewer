@@ -4,7 +4,6 @@
 
 ### Implementation
 * Vuetify 1.x version was used, even though the good looking, Material Design 2 based 2.x alpha is out.
-<br>
 I decided to go for 1.x since I'm no Vuetify expert (yet) and I don't know about 2.x bugs and stability status right now, 
 I don't the technical test to break because of it.
 
@@ -137,7 +136,10 @@ Given that I'm not Docker expert (yet), the tests (once they pass) will try to s
 npm install
 ```
 
-### Generates and serves the components documentation (in progress)
+### Generates and serves the components documentation (in progress) 
+
+Disabled temporarly since it breaks Docker build because of the "acorn" dependency.
+
 ```
 npm run styleguide
 ```
