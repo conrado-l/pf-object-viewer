@@ -1,15 +1,17 @@
 <template>
   <v-layout justify-center data-app="true">
     <v-flex xs12 sm5 mx-2>
-
       <v-card>
+        <!-- Title -->
         <v-card-title class="headline">
           Objects List
         </v-card-title>
+        <!---->
 
         <v-spacer></v-spacer>
 
-        <v-layout justify-center flex-column>
+        <!-- Search, filter and sorting inputs !-->
+        <v-layout justify-center>
           <v-flex xs12 md4 mx-2>
             <v-text-field
                     name="search"
@@ -36,7 +38,6 @@
             >
             </v-select>
           </v-flex>
-
         </v-layout>
         <v-layout justify-center>
           <v-flex xs12 md4 mx-2>
@@ -68,7 +69,9 @@
             </v-select>
           </v-flex>
         </v-layout>
+        <!---->
 
+        <!-- Table rendering the objects !-->
         <v-data-table
                 :headers="headers"
                 :items="objects"
@@ -83,27 +86,32 @@
                          :to="{name: 'object-detail', params: {id: items.item.id}}"
                          title="Go to detail"
                          :key="items.item.id"
-                         :data-test="`item-link-${items.item.id}`"
+                         data-test="item-link"
             >
-              <td v-for="(property, index) in items.item" :key="`tablecell-${property}-${index}`">{{ property }}</td>
+              <td v-for="(property, index) in items.item"
+                  :key="`item-table-cell-${index}-${property}`"
+                  data-test="item-cell">
+                {{ property }}
+              </td>
             </router-link>
           </template>
 
         </v-data-table>
-
       </v-card>
+      <!---->
+
+      <!-- Pagination -->
       <v-layout align-center justify-center my-2>
         <v-pagination
                 v-model="currentPage"
                 :length="getPagination.totalPages"
-                :total-visible="4"
                 :disabled="isLoading"
                 circle
                 data-test="input-pagination"
         ></v-pagination>
       </v-layout>
+      <!---->
     </v-flex>
-
   </v-layout>
 </template>
 
@@ -121,6 +129,7 @@ import loaders from '@/consts/loaders'
 import Toast from 'vuetify-toast'
 import debounce from 'debounce'
 import { DEBOUNCE_INTERVAL } from '@/consts/inputs'
+import { parseRouteQuery } from '@/utils/url'
 
 export default {
   name: 'ObjectList',
@@ -142,15 +151,15 @@ export default {
     }
   },
   created () {
-    this.startFetchObjectPolling(10000) // TODO: let the user set the interval or get it from a config/ENV
+    this.startFetchObjectPolling(this.getPollingInterval)
   },
   methods: {
     /**
-       * Sets the pagination, sorting, and filtering settings from the URL.
+       * Sets the pagination, sorting, and filtering settings.
        * Called from the $route watch.
        */
-    hydrateSettingsFromURL () {
-      this.$store.dispatch('objectsList/applySettings', this.$route.query)
+    applySettings (settings) {
+      this.$store.dispatch('objectsList/applySettings', settings)
     },
     /**
        * Fetches the objects with the associated settings.
@@ -172,18 +181,23 @@ export default {
     },
     /**
        * Pushes the new route with the updated params, triggers route watch and allows the user to go back and forward.
-       * @param {string} name Input name
-       * @param {string} value Input value
+       * @param {string} param Parameter name
+       * @param {string} value Parameter value
        */
-    updateRoute (name, value) {
+    updateRoute (param, value) {
       // The new query that will be pushed to the router
       let newQuery = {}
+
       // Handles single and multiple value inputs (select inputs)
-      let newValue = Array.isArray(value) ? value.join(',') : value
+      let parsedValue = Array.isArray(value) ? value.join(',') : value
 
       // Creates a new query object, merging the current router query and the new/updated value
-      // If the value is falsy vue-router will automatically delete it, avoiding "search=" (can be improved)
-      Object.assign(newQuery, this.$route.query, { [name]: newValue || undefined })
+      Object.assign(newQuery, this.$route.query, { [param]: parsedValue })
+
+      // If the param was cleared/falsy, remove it (this logic can be vastly improved by not adding it in the first place)
+      if (!parsedValue) { // TODO: improve logic
+        delete newQuery[param]
+      }
 
       this.$router.push({
         name: 'objects-list',
@@ -191,7 +205,7 @@ export default {
       })
     },
     /**
-       * Debounces the search input to avoid multiple requests.
+       * Debounces the search input to avoid multiple unnecessary requests.
        */
     debounceSearch: debounce(function (value) { // Can't use arrow function notation because of "this" binding
       this.updateRoute('search', value)
@@ -278,7 +292,8 @@ export default {
       'getObjects',
       'getPagination',
       'getFilters',
-      'getSorting'
+      'getSorting',
+      'getPollingInterval'
     ])
   },
   /**
@@ -290,7 +305,7 @@ export default {
     '$route': {
       immediate: true,
       handler () {
-        this.hydrateSettingsFromURL()
+        this.applySettings(parseRouteQuery(this.$route.query))
         this.fetchObjects()
       }
     }
@@ -300,7 +315,7 @@ export default {
      */
   beforeDestroy () {
     clearInterval(this.pollingInterval)
-    this.$store.commit('objectsList/reset')
+    this.$store.dispatch('objectsList/resetStore') // TODO: Use use mapActions for consistency
   }
 }
 </script>

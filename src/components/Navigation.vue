@@ -6,7 +6,7 @@
 
     <v-btn :to="{name: 'objects-list'}" flat>Objects List</v-btn>
 
-    <v-btn icon>
+    <v-btn @click="fetchObjects" icon title="Fetch objects">
       <v-icon>refresh</v-icon>
     </v-btn>
 
@@ -18,7 +18,12 @@
    * Navigation component for accessing the different sections of the application.
    */
 export default {
-  name: 'Navigation'
+  name: 'Navigation',
+  methods: {
+    fetchObjects () {
+      this.$store.dispatch('objectsList/fetchObjects')
+    }
+  }
 }
 </script>
 

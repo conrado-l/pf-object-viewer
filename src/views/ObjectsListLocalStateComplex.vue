@@ -205,7 +205,6 @@ export default {
           description: object.description,
           type: object.type,
           available: object.available ? 'Yes' : 'No'
-          // TODO: send route for the row click event
         }
       })
     },

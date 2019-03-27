@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { mount } from '@vue/test-utils'
+import { mount, RouterLinkStub } from '@vue/test-utils'
 import ObjectsList from '@/views/ObjectsList'
 import Vuetify from 'vuetify'
 import { Store } from 'vuex-mock-store'
@@ -10,7 +10,7 @@ describe('ObjectsList.vue', () => {
       available: false,
       creation_date: 1553276681,
       description: 'An amazing blue shirt',
-      id: '125',
+      id: '1',
       name: 'Shirt',
       type: 'clothing'
     },
@@ -18,7 +18,7 @@ describe('ObjectsList.vue', () => {
       available: true,
       creation_date: 1553274681,
       description: 'An amazing red shirt',
-      id: '126',
+      id: '2',
       name: 'Shirt',
       type: 'clothing'
     }
@@ -36,7 +36,7 @@ describe('ObjectsList.vue', () => {
         byTerm: {
           search: 'pf',
           selected: 'id',
-          options: []
+          options: ['id', 'name', 'description']
         },
         byAvailability: {
           selected: 'yes',
@@ -47,13 +47,14 @@ describe('ObjectsList.vue', () => {
       'objectsList/getSorting': {
         selected: 'id',
         options: []
-      }
+      },
+      'objectsList/getPollingInterval': 10000
     }
   })
 
   const factoryMount = ({ route, router }) => {
     return mount(ObjectsList, {
-      stubs: ['router-link', 'router-view'],
+      stubs: { RouterLink: RouterLinkStub },
       mocks: {
         $store: store,
         $wait: {
@@ -66,7 +67,8 @@ describe('ObjectsList.vue', () => {
         },
         $router: {
           ...router
-        }
+        },
+        startFetchObjectPolling: () => {}
       },
       // Fix/workaround for Vuetify's warning about data-app
       // https://forum.vuejs.org/t/vuetify-data-app-true-and-problems-rendering-v-dialog-in-unit-tests/27495/9
@@ -100,9 +102,17 @@ describe('ObjectsList.vue', () => {
       }
     }
 
+    const parsedSettings = {
+      page: 1,
+      search: 'pf',
+      filterType: ['name', 'id'],
+      sortBy: 'id',
+      available: 'yes'
+    }
+
     factoryMount({ route })
 
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, 'objectsList/applySettings', route.query)
+    expect(store.dispatch).toHaveBeenNthCalledWith(1, 'objectsList/applySettings', parsedSettings)
   })
 
   it('should call the action for fetching the objects', () => {
@@ -114,31 +124,36 @@ describe('ObjectsList.vue', () => {
   it('should render the input values from the getters correctly', () => { // TODO: fix v-select not getting value
     const wrapper = factoryMount({})
 
-    expect(wrapper.find('[data-test="input-search"').element.value).toBe('pf')
-    // expect(wrapper.find('[data-test="input-filter-type"').element.value).toBe('name')
-    // expect(wrapper.find('[data-test="input-filter-availability"').element.value).toBe('yes')
-    // expect(wrapper.find('[data-test="input-sorting"').element.value).toBe('id')
+    expect(wrapper.find('[data-test="input-search"]').element.value).toBe('pf')
+    // expect(wrapper.find('[data-test="input-filter-type"]').element.value).toBe('name')
+    // expect(wrapper.find('[data-test="input-filter-availability"]').element.value).toBe('yes')
+    // expect(wrapper.find('[data-test="input-sorting"]').element.value).toBe('id')
   })
 
   it('should call updateRoute with the correct params on input', () => {
-    const updateRoute = jest.fn()
     const wrapper = factoryMount({})
+    const updateRoute = jest.fn()
+    const debounceSearch = (searchValue) => { // Mock and call updateRoute immediately (alt: jest.mock('debounce'))
+      updateRoute('search', searchValue)
+    }
 
-    wrapper.setMethods({ updateRoute })
+    wrapper.setMethods({ updateRoute, debounceSearch })
 
     // wrapper.trigger() doesn't allow {target: {value: 'value'}}
     // https://vue-test-utils.vuejs.org/api/wrapper/trigger.html
-    wrapper.find('[data-test="input-search"').element.value = 'fp'
-    wrapper.find('[data-test="input-search"').trigger('input')
+    // TODO: wrapper.setValue('val') is not properly emmiting 'input', investigate and refactor
 
-    wrapper.find('[data-test="input-filter-type"').element.value = 'name'
-    wrapper.find('[data-test="input-filter-type"').trigger('input')
+    wrapper.find('[data-test="input-search"]').element.value = 'fp'
+    wrapper.find('[data-test="input-search"]').trigger('input')
 
-    wrapper.find('[data-test="input-filter-availability"').element.value = 'no'
-    wrapper.find('[data-test="input-filter-availability"').trigger('input')
+    wrapper.find('[data-test="input-filter-type"]').element.value = 'name'
+    wrapper.find('[data-test="input-filter-type"]').trigger('input')
 
-    wrapper.find('[data-test="input-sorting"').element.value = 'name'
-    wrapper.find('[data-test="input-sorting"').trigger('input')
+    wrapper.find('[data-test="input-filter-availability"]').element.value = 'no'
+    wrapper.find('[data-test="input-filter-availability"]').trigger('input')
+
+    wrapper.find('[data-test="input-sorting"]').element.value = 'name'
+    wrapper.find('[data-test="input-sorting"]').trigger('input')
 
     expect(updateRoute).toHaveBeenNthCalledWith(1, 'search', 'fp')
     expect(updateRoute).toHaveBeenNthCalledWith(2, 'filterType', 'name')
@@ -234,7 +249,7 @@ describe('ObjectsList.vue', () => {
 
     wrapper.setMethods({ updateRoute })
 
-    wrapper.find('[data-test="input-pagination"').vm.$emit('input', 3) // TODO: should trigger by click/change maybe
+    wrapper.find('[data-test="input-pagination"]').vm.$emit('input', 3) // TODO: should trigger by click
 
     expect(updateRoute).toHaveBeenCalledTimes(1)
     expect(updateRoute).toHaveBeenCalledWith('page', 3)
@@ -247,14 +262,14 @@ describe('ObjectsList.vue', () => {
       {
         'available': 'No',
         'description': 'An amazing blue shirt',
-        'id': '125',
+        'id': '1',
         'name': 'Shirt',
         'type': 'clothing'
       },
       {
         'available': 'Yes',
         'description': 'An amazing red shirt',
-        'id': '126',
+        'id': '2',
         'name': 'Shirt',
         'type': 'clothing'
       }
@@ -268,6 +283,30 @@ describe('ObjectsList.vue', () => {
     expect(wrapper.vm.objects).toEqual([])
   })
 
-  // TODO: test table rendering correctly
+  it('should render the table items router links correctly', () => {
+    const wrapper = factoryMount({})
+
+    wrapper.findAll('[data-test="item-link"]').wrappers.forEach((itemLink, index) => { // RouterLinkStub
+      expect(itemLink.props().to.name).toBe('object-detail')
+      expect(itemLink.props().to.params.id).toBe(wrapper.vm.objects[index].id)
+    })
+  })
+
+  it('should render the table item objects ordered from the objects computed property correctly', () => {
+    const wrapper = factoryMount({})
+
+    const itemLinks = wrapper.findAll('[data-test="item-link"]')
+
+    itemLinks.wrappers.forEach((itemLink, itemLinkIndex) => {
+      const itemCells = itemLink.findAll('[data-test="item-cell"]').wrappers
+
+      expect(itemCells[0].text()).toBe(wrapper.vm.objects[itemLinkIndex].id)
+      expect(itemCells[1].text()).toBe(wrapper.vm.objects[itemLinkIndex].name)
+      expect(itemCells[2].text()).toBe(wrapper.vm.objects[itemLinkIndex].description)
+      expect(itemCells[3].text()).toBe(wrapper.vm.objects[itemLinkIndex].type)
+      expect(itemCells[4].text()).toBe(wrapper.vm.objects[itemLinkIndex].available)
+    })
+  })
+
   // TODO: test polling interval fetching objects
 })

@@ -78,6 +78,10 @@ npm run build
 npm run test:unit
 ```
 
+Warnings about core-js version are shown, it's actually a Vue-CLI error and it was fixed 12 hours ago in 3.5.2 
+(I'm using 3.5.1):
+https://github.com/vuejs/vue-cli/issues/3695
+
 If anything goes wrong with Jest, run `jest --clearCache`
 
 ### Run your end-to-end tests

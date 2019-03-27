@@ -73,6 +73,7 @@ describe('ObjectDetail.vue', () => {
   it('should dispatch fetchObject action with the object id as payload', () => {
     factoryShallowMount()
 
+    expect(store.dispatch).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledWith('objectDetail/fetchObject', mockupObject.id)
   })
 
@@ -103,7 +104,7 @@ describe('ObjectDetail.vue', () => {
     expect(wrapper.vm.isLoading).toBe(true)
   })
 
-  it('should dispatch fetchObject action and set error to true if the action fails', () => {
+  it('should dispatch fetchObject action and set error to true if the action fails', () => { // TODO: fix test
     // store.dispatch = jest.fn().mockRejectedValue('data')
     //
     // const wrapper = factoryShallowMount()

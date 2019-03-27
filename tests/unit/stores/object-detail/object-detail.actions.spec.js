@@ -2,7 +2,7 @@ import actions from './object-detail.actions'
 
 let url = ''
 
-jest.mock('@/api/api-service.js', () => ({
+jest.mock('@/api/api-service.js', () => ({ // TODO: extract and use the one in /api/__mocks__
   get: (_url) => {
     return new Promise((resolve) => {
       url = _url
@@ -19,6 +19,6 @@ describe('fetchObject', () => {
     await actions.fetchObject({ commit }, objectId)
 
     expect(url).toBe(`${process.env.VUE_APP_BASE_API_URL}/objects/${objectId}`)
-    expect(commit).toHaveBeenCalledWith('SET_OBJECT', true)
+    expect(commit).toHaveBeenCalledWith('SET_OBJECT', true) // TODO: improve it as a real response
   })
 })

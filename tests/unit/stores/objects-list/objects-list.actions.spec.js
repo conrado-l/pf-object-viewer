@@ -30,7 +30,7 @@ describe('fetchObjects', () => {
 
     expect(url).toBe(`${process.env.VUE_APP_BASE_API_URL}/objects${serializedQuery}`)
     expect(commit).toHaveBeenCalledWith('SET_OBJECTS', true)
-    expect(commit).toHaveBeenCalledWith('SET_TOTAL_PAGES', 3)
+    expect(commit).toHaveBeenCalledWith('SET_PAGINATION_SETTINGS', { totalObjects: 10, totalPages: 2 })
   })
 })
 describe('applySettings', () => {
@@ -50,3 +50,4 @@ describe('applySettings', () => {
     expect(commit).toHaveBeenCalledWith('SET_SETTINGS', settings)
   })
 })
+//

@@ -17,10 +17,6 @@ export default {
   name: 'App',
   components: {
     Navigation
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

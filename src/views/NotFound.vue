@@ -1,5 +1,7 @@
 <template>
-<h4> Not found </h4>
+  <v-layout justify-center>
+    <h4> Not found </h4>
+  </v-layout>
 </template>
 
 <script>

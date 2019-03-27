@@ -9,7 +9,8 @@ import axios from 'axios'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 let config = {
-  baseURL: 'http://5c929f60e7b1a00014078e44.mockapi.io'
+  baseURL: 'http://localhost:3000'
+  // baseURL: 'http://5c929f60e7b1a00014078e44.mockapi.io'
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 }
