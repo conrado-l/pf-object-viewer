@@ -4,7 +4,7 @@
       <v-card>
         <!-- Title -->
         <v-card-title class="headline">
-          Objects List
+          {{ title }}
         </v-card-title>
         <!---->
 
@@ -33,7 +33,6 @@
                     item-text="description"
                     item-value="value"
                     clearable
-                    multiple
                     data-test="input-filter-type"
             >
             </v-select>
@@ -117,13 +116,13 @@
 
 <script>
 /***
-   * This was my first idea and approach for the functionality. I used Vuetify's components + Vuex.
-   * I decided to go for single Vuetify components + Vuex because the model management is much better and the code
-   * is better organized and cleaner.
-   * It also enables other components (if that was the case) to access the objects, pagination, filters and sorting.
-   * In my opinion Vuex (sometimes) should be used in medium to large apps for avoiding to refactor from local state to Vuex later.
-   * Vuex is not a silver bullet, and it's not always the right tool, but "Use Vuex before is too late".
-   */
+ * This was my first idea and approach for the functionality. I used Vuetify's components + Vuex.
+ * I decided to go for single Vuetify components + Vuex because the model management is much better, the code
+ * is better organized and cleaner.
+ * It also enables other components (if that was the case) to access the objects, pagination, filters and sorting.
+ * In my opinion Vuex (sometimes) should be used in medium to large apps for avoiding to refactor from local state to Vuex later.
+ * Vuex is not a silver bullet, and it's not always the right tool, but "Use Vuex before is too late".
+ */
 import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
 import Toast from 'vuetify-toast'
@@ -135,6 +134,7 @@ export default {
   name: 'ObjectList',
   data () {
     return {
+      title: 'Objects List',
       pollingInterval: null,
       headers: [
         {
@@ -157,6 +157,7 @@ export default {
     /**
      * Sets the pagination, sorting, and filtering settings.
      * Called from the $route watch.
+     * @param {object} settings
      */
     applySettings (settings) {
       this.$store.dispatch('objectsList/applySettings', settings)
@@ -193,6 +194,11 @@ export default {
 
       // Creates a new query object, merging the current router query and the new/updated value
       Object.assign(newQuery, this.$route.query, { [param]: parsedValue })
+
+      // If a filter/sorting/input is changed, set the page to the first
+      if (param !== 'page') {
+        newQuery.page = 1
+      }
 
       // If the param was cleared/falsy, remove it (this logic can be vastly improved by not adding it in the first place)
       if (!parsedValue) { // TODO: improve logic

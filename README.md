@@ -23,7 +23,8 @@ do everything, you could add inputs dynamically on the fly and it dynamically co
 ended up being too big and too broad, the abstraction was too much and the component had more responsabilities than it should.
 
 3) Finally I went for my first approach, using Vuex for managing the whole state and settings, and using Vuetify components
-separatly.
+separatly. I think using Vuetify components without creating a new abstraction is good because they are modular and every component
+has a single responsability: inputs, pagination and tables.
 
 You can check the code for the other 2 ideas in the other branch, called `experiments`.
 
@@ -56,12 +57,12 @@ for 1 sorting column only, even though there is a hacky way to accomplish it: ht
 
 * I thought about using the TreeView for the Object Detail but it looks to hacky for a "normal user" of course.
 
-* The router-link can't be accesed right now with right click or 3rd click, since it needs to be an <a>.
+* The router-link can't be accesed right now with right click or 3rd click, since it needs to be an anchor tag.
 
 * I added a plugin for using Vuetify's toasts easily, it should be added globally but its local now.
 
 * Since I didn't have the time because of my current work, there are several things that can and must be improved.
-They are indicated with the "TODO:" keyword, and they are in the "Must do improvments" card in the Trello board.
+They are indicated with the "TODO:" keyword, and they are in the "Must do improvements" card in the Trello board.
 
 * I was going to build a json-server Docker image but I didn't have the time to do it and I still lack experience with
 Docker, even though I know the basics. I'm always learning and improving.

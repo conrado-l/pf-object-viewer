@@ -18,8 +18,8 @@
 
 <script>
 /**
-   * Fetches an object's detail data by ID and renders it in a card detail.
-   */
+ * Fetches an object's detail data by ID and renders it in a card detail.
+ */
 import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
 import CardDetail from '@/components/CardDetail'

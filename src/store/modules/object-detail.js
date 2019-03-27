@@ -57,7 +57,7 @@ const actions = {
 
       get(URL)
         .then((res) => {
-          commit(types.SET_OBJECT, res.data.object)
+          commit(types.SET_OBJECT, res.data)
           resolve()
         })
         .catch((err) => {

@@ -6,8 +6,8 @@
 
 <script>
 /**
-   * Not found error indication.
-   */
+ * Not found page error indication.
+ */
 export default {
   name: 'NotFound'
 }

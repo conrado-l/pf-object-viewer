@@ -98,12 +98,12 @@ const getters = {
       params._sort = state.sorting.selected
     }
 
-    if (state.filters.byTerm.selected) {
-      params.filterBy = state.filters.byTerm.selected.join(',')
+    if (state.filters.byTerm.selected && state.filters.byTerm.search) {
+      params[state.filters.byTerm.selected] = state.filters.byTerm.search
     }
 
     if (state.filters.byTerm.search) {
-      params.q = state.filters.byTerm.search
+      // params.q = state.filters.byTerm.search
     }
 
     if (state.filters.byAvailability.selected) {
@@ -146,7 +146,7 @@ const mutations = {
    */
   [types.SET_SETTINGS] (state, { search, page, filterType, sortBy, available }) { // TODO: check if URL filter/sort is valid
     state.filters.byTerm.search = search || ''
-    state.filters.byTerm.selected = filterType ? filterType.toString().split(',') : '' // TODO: improve
+    state.filters.byTerm.selected = filterType || ''
     state.filters.byAvailability.selected = available || ''
     state.pagination.current = page ? Number(page) : state.pagination.current
     state.sorting.selected = sortBy ? sortBy.toString().split(',') : '' // TODO: improve
