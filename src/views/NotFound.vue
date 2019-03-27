@@ -5,6 +5,9 @@
 </template>
 
 <script>
+/**
+   * Not found error indication.
+   */
 export default {
   name: 'NotFound'
 }

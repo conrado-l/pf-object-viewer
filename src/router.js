@@ -14,7 +14,7 @@ export default new Router({
       name: 'home',
       redirect: { name: 'objects-list' }
     },
-    { // TODO: create a father route and /list, /:id as children maybe
+    { // TODO: create a father objects route and /list, /:id as children
       path: '/objects/list',
       name: 'objects-list',
       component: ObjectsList
@@ -23,7 +23,7 @@ export default new Router({
       path: '/objects/:id',
       name: 'object-detail',
       props: true,
-      component: () => import('./views/ObjectDetail') // Add webpackChunk for lazy component
+      component: () => import('./views/ObjectDetail') // Add webpackChunk for async components
     },
     {
       path: '*',

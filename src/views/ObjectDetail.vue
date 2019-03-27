@@ -44,8 +44,8 @@ export default {
   },
   methods: {
     /**
-       * Fetches the object detail with the associated ID.
-       */
+     * Fetches the object detail with the associated ID.
+     */
     fetchObjectDetail () {
       this.$store.dispatch('objectDetail/fetchObject', this.id)
         .then(() => {
@@ -67,10 +67,10 @@ export default {
   },
   computed: {
     /**
-       * Generates the object detail with the associated description label.
-       * @returns {object}
-       * Consideration: the server could also send the label but i18n should be server-side then.
-       */
+     * Generates the object detail with the associated description label.
+     * @returns {object}
+     * Consideration: the server could also send the label but i18n should be server-side then.
+     */
     objectDetail () {
       if (!this.getObject) {
         return []
@@ -86,9 +86,9 @@ export default {
       ]
     },
     /**
-       * Indicates if there is a fetching operation at the moment.
-       * @returns {boolean}
-       */
+     * Indicates if there is a fetching operation at the moment.
+     * @returns {boolean}
+     */
     isLoading () {
       return this.$wait.is(loaders.objectDetail.FETCH_OBJECT_DETAIL)
     },
@@ -97,8 +97,8 @@ export default {
     ])
   },
   /**
-     * Resets the store when the component is about the be destroyed to avoid showing old data when fetching new one.
-     */
+   * Resets the store when the component is about the be destroyed to avoid showing old data when fetching new one.
+   */
   beforeDestroy () {
     this.$store.commit('objectDetail/reset')
   }

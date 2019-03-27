@@ -155,15 +155,15 @@ export default {
   },
   methods: {
     /**
-       * Sets the pagination, sorting, and filtering settings.
-       * Called from the $route watch.
-       */
+     * Sets the pagination, sorting, and filtering settings.
+     * Called from the $route watch.
+     */
     applySettings (settings) {
       this.$store.dispatch('objectsList/applySettings', settings)
     },
     /**
-       * Fetches the objects with the associated settings.
-       */
+     * Fetches the objects with the associated settings.
+     */
     fetchObjects () {
       this.$store.dispatch('objectsList/fetchObjects')
         .catch(() => {
@@ -171,19 +171,19 @@ export default {
         })
     },
     /**
-       * Starts the interval for polling the objects data every X seconds.
-       * @param {number} interval Interval in milliseconds
-       */
+     * Starts the interval for polling the objects data every X seconds.
+     * @param {number} interval Interval in milliseconds
+     */
     startFetchObjectPolling (interval) {
       this.pollingInterval = setInterval(() => {
         this.fetchObjects()
       }, interval)
     },
     /**
-       * Pushes the new route with the updated params, triggers route watch and allows the user to go back and forward.
-       * @param {string} param Parameter name
-       * @param {string} value Parameter value
-       */
+     * Pushes the new route with the updated params, triggers route watch and allows the user to go back and forward.
+     * @param {string} param Parameter name
+     * @param {string} value Parameter value
+     */
     updateRoute (param, value) {
       // The new query that will be pushed to the router
       let newQuery = {}
@@ -205,19 +205,19 @@ export default {
       })
     },
     /**
-       * Debounces the search input to avoid multiple unnecessary requests.
-       */
+     * Debounces the search input to avoid multiple unnecessary requests.
+     */
     debounceSearch: debounce(function (value) { // Can't use arrow function notation because of "this" binding
       this.updateRoute('search', value)
     }, DEBOUNCE_INTERVAL)
   },
   computed: {
     /**
-       * v-model setters/getters for the inputs.
-       * Could also use :value and @input on every input instead but in this case I don't want to pollute the view with logic.
-       * Every input would need: @input="updateRoute('inputName', $event).
-       * Its a trade-off between polluting the view with boilerplate logic vs. having larger setter/getters methods.
-       **/
+     * v-model setters/getters for the inputs.
+     * Could also use :value and @input on every input instead but in this case I don't want to pollute the view with logic.
+     * Every input would need: @input="updateRoute('inputName', $event).
+     * Its a trade-off between polluting the view with boilerplate logic vs. having larger setter/getters methods.
+     **/
     filterSearch: {
       get () {
         return this.getFilters.byTerm.search
@@ -263,16 +263,16 @@ export default {
       }
     },
     /** *
-       * Indicates if there is a fetching operation at the moment.
-       * @returns {boolean}
-       */
+     * Indicates if there is a fetching operation at the moment.
+     * @returns {boolean}
+     */
     isLoading () {
       return this.$wait.is(loaders.objectsList.FETCH_OBJECTS) // vue-wait plugin
     },
     /**
-       * Computes the objects structure for showing in the table.
-       * @returns {object}
-       */
+     * Computes the objects structure for showing in the table.
+     * @returns {object}
+     */
     objects () {
       if (!this.getObjects) {
         return []
@@ -297,10 +297,10 @@ export default {
     ])
   },
   /**
-     * When a new route is detected, the settings will be hydrated from the URL and the objects will be fetched.
-     * The URL is taken as the single source of truth in this case.
-     * beforeRouteUpdate hook could also be used, but there is no need to prevent navigation.
-     */
+   * When a new route is detected, the settings will be hydrated from the URL and the objects will be fetched.
+   * The URL is taken as the single source of truth in this case.
+   * beforeRouteUpdate hook could also be used, but there is no need to prevent navigation.
+   */
   watch: {
     '$route': {
       immediate: true,
@@ -311,11 +311,11 @@ export default {
     }
   },
   /**
-     * When the component is about the be destroyed, clear the interval, avoiding memory leaks and reset the store.
-     */
+   * When the component is about the be destroyed, clear the interval, avoiding memory leaks and reset the store.
+   */
   beforeDestroy () {
     clearInterval(this.pollingInterval)
-    this.$store.dispatch('objectsList/resetStore') // TODO: Use use mapActions for consistency
+    this.$store.dispatch('objectsList/resetStore') // TODO: use mapActions for consistency
   }
 }
 </script>

@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router'
 import store from './store/index'
 import VueWait from 'vue-wait'
-import Transitions from 'vue2-transitions'
 import VueMoment from 'vue-moment'
 import './plugins/axios'
 import './plugins/vuetify'
@@ -14,7 +13,6 @@ Vue.config.productionTip = false
 /** Plugins */
 Vue.use(VueWait)
 Vue.use(VueMoment)
-Vue.use(Transitions)
 
 /** Error handler **/
 /* Vue.config.errorHandler = (err, vm, info) => {
