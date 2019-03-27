@@ -27,7 +27,7 @@
           <v-flex xs12 md6 mx-2>
             <v-select
                     name="filterType"
-                    label="Filter type"
+                    label="Search by"
                     v-model="filterType"
                     :items="getFilters.byTerm.options"
                     item-text="description"

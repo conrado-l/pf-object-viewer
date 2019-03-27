@@ -13,6 +13,7 @@ const initialState = () => ({ // TODO: improve state structure and refactor
       options: [
         { value: 'name', description: 'Name' },
         { value: 'description', description: 'Description' },
+        { value: 'type', description: 'Type' },
         { value: 'id', description: 'ID' }
       ]
     },
