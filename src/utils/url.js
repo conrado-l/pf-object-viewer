@@ -1,6 +1,6 @@
 /**
  * Generates a URL query based on the object properties
- * Example: Input {value: 1, name: 'George'} --> Output '?value=1&name=George'
+ * Example: {value: 1, name: 'George'} --> '?value=1&name=George'
  * @param {object} paramsObject
  */
 export function generateURLQueryFromObject (paramsObject) {

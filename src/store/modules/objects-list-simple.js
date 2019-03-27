@@ -100,7 +100,7 @@ const actions = {
       get(URL)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data.objects)
-          commit(types.SET_TOTAL_PAGES, res.data.totalPages)
+          // commit(types.SET_TOTAL_PAGES, res.data.totalPages)
           resolve()
         })
         .catch((err) => {

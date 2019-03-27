@@ -14,6 +14,9 @@
 </template>
 
 <script>
+/**
+   * Navigation component for accessing the different sections of the application.
+   */
 export default {
   name: 'Navigation'
 }

@@ -3,7 +3,7 @@ import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
 import { generateURLQueryFromObject } from '@/utils/url'
 
-// Keep the initial state in case we need to reset the store, when a component destroys for example.
+// Keep the initial state in case we need to reset the store, when a component is destroyed for example.
 const initialState = () => ({
   objects: [],
   filters: {
@@ -34,8 +34,8 @@ const initialState = () => ({
   },
   pagination: {
     current: 1,
-    totalObjects: 5, // TODO: set by the API response
-    totalPages: 5, // TODO: set by the API response
+    totalObjects: 1,
+    totalPages: 3, // TODO: change when the API is ready
     limit: 5 // TODO: set by the user?
   }
 })
@@ -79,7 +79,7 @@ const getters = {
    * Generates an object containing the current pagination and the enabled sorting/filter settings.
    * @param {object} state
    */
-  getCurrentSettings (state) {
+  createAPIRequestSettings (state) {
     let params = {}
 
     params.page = state.pagination.current
@@ -133,14 +133,13 @@ const mutations = {
    * @param {string} [settings.sortBy] - Sorting type
    * @param {string} [settings.available] - Availability filter
    * @param {string} [settings.page] - Page number
-   * TODO: can be refactored into an action that fires a different mutation for every state property
    */
   [types.SET_SETTINGS] (state, { search, page, filterType, sortBy, available }) { // TODO: check if URL filter/sort is valid
     state.filters.byTerm.search = search || ''
-    state.filters.byTerm.selected = filterType || ''
+    state.filters.byTerm.selected = filterType ? filterType.toString().split(',') : ''
     state.filters.byAvailability.selected = available || ''
-    state.sorting.selected = sortBy || ''
     state.pagination.current = page ? Number(page) : state.pagination.current
+    state.sorting.selected = sortBy ? sortBy.toString().split(',') : ''
   },
   /**
    * Sets the total pages for pagination.
@@ -149,7 +148,7 @@ const mutations = {
    * @param {string} totalObjects - Total objects count.
    */
   [types.SET_PAGINATION_SETTINGS] (state, { totalPages, totalObjects }) {
-    state.pagination.totalPages = totalPages ? Number(totalPages) : state.totalPages
+    // state.pagination.totalPages = totalPages ? Number(totalPages) : state.totalPages // TODO: set when the API is ready
     state.pagination.totalObjects = totalObjects ? Number(totalObjects) : state.totalObjects
   }
 }
@@ -164,37 +163,19 @@ const actions = {
   fetchObjects ({ commit, dispatch, getters }) {
     const loaderName = loaders.objectsList.FETCH_OBJECTS
 
-    /* const mockupObjectList = new Promise((resolve => {
-      const response = {
-        objects: [
-          {
-            id: 1,
-            name: 'Object 1',
-            description: 'Im object 1 description!'
-          },
-          {
-            id: 2,
-            name: 'Object 2',
-            description: 'Im object 2 description!'
-          }
-        ]
-      }
-      setTimeout(() => {
-        resolve(response)
-      }, 500)
-    })) */
-
     return new Promise((resolve, reject) => {
-      dispatch('wait/start', loaderName, { root: true })
+      dispatch('wait/start', loaderName, { root: true }) // vue-wait plugin
 
-      const serializedQuery = generateURLQueryFromObject(getters.getCurrentSettings)
+      const serializedQuery = generateURLQueryFromObject(getters.createAPIRequestSettings) // can be improved
 
       const URL = `/objects${serializedQuery}`
 
       get(URL)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data.objects)
-          // commit(types.SET_PAGINATION_SETTINGS, {totalPages: res.data.totalPages, totalObjects: res.data.totalObjects})
+          commit(types.SET_PAGINATION_SETTINGS, {
+            totalObjects: res.data.totalObjects
+          })
           resolve()
         })
         .catch((err) => {
@@ -207,8 +188,13 @@ const actions = {
   /**
    * Sets the settings for pagination, sorting and filtering.
    * @param commit
-   * @param {object} settings
-   * Consideration: the mutation could be called without an action, depending on the person.
+   * @param {object} settings - Settings
+   * @param {string} [settings.search] - Filter term
+   * @param {string} [settings.filterType] - Filter type
+   * @param {string} [settings.sortBy] - Sorting type
+   * @param {string} [settings.available] - Availability filter
+   * @param {string} [settings.page] - Page number
+   * Consideration: the mutation/s could be called without an action, depends on the person.
    */
   applySettings ({ commit }, settings) {
     commit(types.SET_SETTINGS, settings)

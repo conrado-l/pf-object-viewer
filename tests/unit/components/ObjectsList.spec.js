@@ -67,10 +67,10 @@ describe('ObjectsList.vue', () => {
         $router: {
           ...router
         }
-      }
+      },
       // Fix/workaround for Vuetify's warning about data-app
       // https://forum.vuejs.org/t/vuetify-data-app-true-and-problems-rendering-v-dialog-in-unit-tests/27495/9
-      // attachToDocument: true
+      attachToDocument: true
     })
   }
 
@@ -81,7 +81,6 @@ describe('ObjectsList.vue', () => {
 
   afterEach(() => {
     store.reset()
-    // wrapper.destroy() // Should be called because of attachToDocument
   })
 
   it('should render the component correctly', () => {
@@ -95,7 +94,7 @@ describe('ObjectsList.vue', () => {
       query: {
         page: 1,
         search: 'pf',
-        filterType: 'name',
+        filterType: 'name,id',
         sortBy: 'id',
         available: 'yes'
       }
@@ -147,7 +146,7 @@ describe('ObjectsList.vue', () => {
     expect(updateRoute).toHaveBeenNthCalledWith(4, 'sortBy', 'name')
   })
 
-  it('should update the route correctly when input updates', () => {
+  it('should update the router correctly when input updates', () => {
     const router = {
       push: jest.fn()
     }
@@ -175,7 +174,7 @@ describe('ObjectsList.vue', () => {
     })
   })
 
-  it('should delete the route param when the input is falsy/empty', () => {
+  it('should delete the route param when a single value input is falsy/empty', () => {
     const router = {
       push: jest.fn()
     }
@@ -202,13 +201,40 @@ describe('ObjectsList.vue', () => {
     })
   })
 
+  it('should delete the route param when a multiple value input is falsy/empty', () => {
+    const router = {
+      push: jest.fn()
+    }
+
+    const route = {
+      query: {
+        page: 1,
+        search: 'pf',
+        filterType: 'name'
+      }
+    }
+
+    const wrapper = factoryMount({ route, router })
+
+    wrapper.vm.updateRoute('filterType', [])
+
+    expect(router.push).toHaveBeenCalledTimes(1)
+    expect(router.push).toHaveBeenCalledWith({
+      name: 'objects-list',
+      query: {
+        page: 1,
+        search: 'pf'
+      }
+    })
+  })
+
   it('should call updateRoute with the correct params when pagination updates', () => {
     const updateRoute = jest.fn()
     const wrapper = factoryMount({})
 
     wrapper.setMethods({ updateRoute })
 
-    wrapper.find('[data-test="input-pagination"').vm.$emit('input', 3) // Should trigger by click/change maybe
+    wrapper.find('[data-test="input-pagination"').vm.$emit('input', 3) // TODO: should trigger by click/change maybe
 
     expect(updateRoute).toHaveBeenCalledTimes(1)
     expect(updateRoute).toHaveBeenCalledWith('page', 3)

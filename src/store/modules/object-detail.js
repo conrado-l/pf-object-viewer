@@ -2,7 +2,7 @@ import types from './object-detail.mutation'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
 
-// Keep the initial state in case we need to reset the store, when a component destroys for example.
+// Keep the initial state in case we need to reset the store, when a component is destroyed for example.
 const initialState = () => ({
   object: null
 })
@@ -61,7 +61,7 @@ const actions = {
           resolve()
         })
         .catch((err) => {
-          console.error('An error has occured while fetching the object id', err)
+          console.error('An error has occured while fetching the object detail', err)
           reject(err)
         })
         .finally(() => dispatch('wait/end', loaderName, { root: true }))

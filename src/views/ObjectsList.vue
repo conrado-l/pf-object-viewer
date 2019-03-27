@@ -1,73 +1,73 @@
 <template>
-  <v-layout justify-center data-app>
+  <v-layout justify-center data-app="true">
     <v-flex xs12 sm5 mx-2>
-      <v-layout justify-center>
-        <v-flex xs12 md4 mx-2>
-          <v-text-field
-                  name="search"
-                  label="Search filter"
-                  v-model="filterSearch"
-                  solo
-                  clearable
-                  data-test="input-search"
-          >
-          </v-text-field>
-        </v-flex>
 
-        <v-flex xs12 md4 mx-2>
-          <v-select
-                  name="filterType"
-                  label="Filter type"
-                  v-model="filterType"
-                  :items="getFilters.byTerm.options"
-                  item-text="description"
-                  item-value="value"
-                  solo
-                  clearable
-                  data-test="input-filter-type"
-          >
-          </v-select>
-        </v-flex>
-
-      </v-layout>
-      <v-layout justify-center>
-        <v-flex xs12 md4 mx-2>
-          <v-select
-                  name="available"
-                  label="Available"
-                  v-model="filterAvailable"
-                  :items="getFilters.byAvailability.options"
-                  item-text="description"
-                  item-value="value"
-                  solo
-                  clearable
-                  data-test="input-filter-availability"
-          >
-          </v-select>
-        </v-flex>
-        <v-flex xs12 md6 mx-2>
-          <v-select
-                  name="sortBy"
-                  label="Sort by"
-                  v-model="sorting"
-                  :items="getSorting.options"
-                  item-text="description"
-                  item-value="value"
-                  clearable
-                  solo
-                  multiple
-                  data-test="input-sorting"
-
-          >
-          </v-select>
-        </v-flex>
-      </v-layout>
       <v-card>
         <v-card-title class="headline">
           Objects List
         </v-card-title>
 
         <v-spacer></v-spacer>
+
+        <v-layout justify-center flex-column>
+          <v-flex xs12 md4 mx-2>
+            <v-text-field
+                    name="search"
+                    label="Search"
+                    v-model="filterSearch"
+                    clearable
+                    autofocus
+                    data-test="input-search"
+            >
+            </v-text-field>
+          </v-flex>
+
+          <v-flex xs12 md6 mx-2>
+            <v-select
+                    name="filterType"
+                    label="Filter type"
+                    v-model="filterType"
+                    :items="getFilters.byTerm.options"
+                    item-text="description"
+                    item-value="value"
+                    clearable
+                    multiple
+                    data-test="input-filter-type"
+            >
+            </v-select>
+          </v-flex>
+
+        </v-layout>
+        <v-layout justify-center>
+          <v-flex xs12 md4 mx-2>
+            <v-select
+                    name="available"
+                    label="Available"
+                    v-model="filterAvailable"
+                    :items="getFilters.byAvailability.options"
+                    item-text="description"
+                    item-value="value"
+                    clearable
+                    data-test="input-filter-availability"
+            >
+            </v-select>
+          </v-flex>
+          <v-flex xs12 md6 mx-2>
+            <v-select
+                    name="sortBy"
+                    label="Sort by"
+                    v-model="sorting"
+                    :items="getSorting.options"
+                    item-text="description"
+                    item-value="value"
+                    clearable
+                    multiple
+                    data-test="input-sorting"
+
+            >
+            </v-select>
+          </v-flex>
+        </v-layout>
 
         <v-data-table
                 :headers="headers"
@@ -83,9 +83,9 @@
                          :to="{name: 'object-detail', params: {id: items.item.id}}"
                          title="Go to detail"
                          :key="items.item.id"
-                         :data-test="`item-${items.item.id}`"
+                         :data-test="`item-link-${items.item.id}`"
             >
-              <td v-for="(property, index) in items.item" :key="`tabledata-${property}-${index}`">{{ property }}</td>
+              <td v-for="(property, index) in items.item" :key="`tablecell-${property}-${index}`">{{ property }}</td>
             </router-link>
           </template>
 
@@ -94,11 +94,10 @@
       </v-card>
       <v-layout align-center justify-center my-2>
         <v-pagination
-                :value="getPagination.current"
+                v-model="currentPage"
                 :length="getPagination.totalPages"
                 :total-visible="4"
                 :disabled="isLoading"
-                @input="updatePagination"
                 circle
                 data-test="input-pagination"
         ></v-pagination>
@@ -110,7 +109,7 @@
 
 <script>
 /***
-   * This was my first idea and approach for the functionality. I used the single Vuetify components + Vuex.
+   * This was my first idea and approach for the functionality. I used Vuetify's components + Vuex.
    * I decided to go for single Vuetify components + Vuex because the model management is much better and the code
    * is better organized and cleaner.
    * It also enables other components (if that was the case) to access the objects, pagination, filters and sorting.
@@ -119,6 +118,9 @@
    */
 import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
+import Toast from 'vuetify-toast'
+import debounce from 'debounce'
+import { DEBOUNCE_INTERVAL } from '@/consts/inputs'
 
 export default {
   name: 'ObjectList',
@@ -140,11 +142,12 @@ export default {
     }
   },
   created () {
-    // this.startFetchObjectPolling(10000)
+    this.startFetchObjectPolling(10000) // TODO: let the user set the interval or get it from a config/ENV
   },
   methods: {
     /**
        * Sets the pagination, sorting, and filtering settings from the URL.
+       * Called from the $route watch.
        */
     hydrateSettingsFromURL () {
       this.$store.dispatch('objectsList/applySettings', this.$route.query)
@@ -155,7 +158,7 @@ export default {
     fetchObjects () {
       this.$store.dispatch('objectsList/fetchObjects')
         .catch(() => {
-          // Show toast or text error in the table
+          Toast.error('An error has occured while fetching the objects.')
         })
     },
     /**
@@ -165,7 +168,7 @@ export default {
     startFetchObjectPolling (interval) {
       this.pollingInterval = setInterval(() => {
         this.fetchObjects()
-      }, interval) // TODO: let the user set the interval or get it from a config/ENV
+      }, interval)
     },
     /**
        * Pushes the new route with the updated params, triggers route watch and allows the user to go back and forward.
@@ -173,22 +176,26 @@ export default {
        * @param {string} value Input value
        */
     updateRoute (name, value) {
-      // Create a new object from the router query and add a new property to it for the new/updated value
-      // If the value is falsy, set it to undefined so vue-router will delete it automatically (can be improved)
-      // https://github.com/vuejs/vue-router/pull/1568
-      const query = Object.assign({}, this.$route.query, { [name]: value || undefined })
+      // The new query that will be pushed to the router
+      let newQuery = {}
+      // Handles single and multiple value inputs (select inputs)
+      let newValue = Array.isArray(value) ? value.join(',') : value
+
+      // Creates a new query object, merging the current router query and the new/updated value
+      // If the value is falsy vue-router will automatically delete it, avoiding "search=" (can be improved)
+      Object.assign(newQuery, this.$route.query, { [name]: newValue || undefined })
 
       this.$router.push({
         name: 'objects-list',
-        query
+        query: newQuery
       })
     },
     /**
-       * Pushes the new page to the router.
+       * Debounces the search input to avoid multiple requests.
        */
-    updatePagination (value) {
-      this.updateRoute('page', value)
-    }
+    debounceSearch: debounce(function (value) { // Can't use arrow function notation because of "this" binding
+      this.updateRoute('search', value)
+    }, DEBOUNCE_INTERVAL)
   },
   computed: {
     /**
@@ -202,7 +209,11 @@ export default {
         return this.getFilters.byTerm.search
       },
       set (value) {
-        this.updateRoute('search', value)
+        if (value) {
+          this.debounceSearch(value) // Debounce the route update if there is input
+        } else {
+          this.updateRoute('search', '') // Update the route immediately if the input was cleared
+        }
       }
     },
     filterType: {
@@ -229,14 +240,24 @@ export default {
         this.updateRoute('sortBy', value)
       }
     },
+    currentPage: {
+      get () {
+        return this.getPagination.current
+      },
+      set (value) {
+        this.updateRoute('page', value)
+      }
+    },
     /** *
        * Indicates if there is a fetching operation at the moment.
+       * @returns {boolean}
        */
     isLoading () {
-      return this.$wait.is(loaders.objectsList.FETCH_OBJECTS)
+      return this.$wait.is(loaders.objectsList.FETCH_OBJECTS) // vue-wait plugin
     },
     /**
        * Computes the objects structure for showing in the table.
+       * @returns {object}
        */
     objects () {
       if (!this.getObjects) {

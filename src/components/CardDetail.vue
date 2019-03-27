@@ -32,7 +32,9 @@
 </template>
 
 <script>
-
+/**
+   * A reusable card component with a title and properties listed vertically
+   */
 export default {
   name: 'CardDetail',
   props: {
