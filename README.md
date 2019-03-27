@@ -72,11 +72,14 @@ Docker, even though I know the basics. I'm always learning and improving.
 ### Trello dashboard progress
 https://trello.com/b/93A8QLtj/pf
 ### Installation
-* If Docker and NPM install fails: `npm cache clean --force
-                                          rm -rf ~/.npm
-                                          # In the project folder:
-                                          rm -rf node_modules
-                                          rm -f package-lock.json`
+* If Docker and NPM install fails: 
+```
+npm cache clean --force
+rm -rf ~/.npm
+# In the project folder:
+rm -rf node_modules
+rm -f package-lock.json
+```
                                           
 * If NPM and Docker show a DNS related error, follow the steps: `https://development.robinwinslow.uk/2016/06/23/fix-docker-networking-dns/`                                          
                                           
@@ -89,7 +92,7 @@ https://trello.com/b/93A8QLtj/pf
  
 * Great and funny video (700+ pages presentation) about mock testing with Justin Searls: https://www.youtube.com/watch?v=Af4M8GMoxi4                                  
 
-* TODO: I learned about how some things worked in Vuetify by looking at their tests:
+* I learned about how some things worked in Vuetify by looking at their tests:
 https://github.com/vuetifyjs/vuetify/tree/master/packages/vuetify/test/unit/components
 
 While I was doing this project, the new vue-dev-tools 5.0 version came out, what a great time to be alive! (`and to use VueJS`)
@@ -118,13 +121,13 @@ sudo docker build -t pf-frontend .
 
 ### Run unit tests
 ```
-sudo docker run -it -p 8080:8080 --rm --name pf-frontend --build-arg run=test
+sudo docker run -it -p 8080:8080 --rm --name pf-frontend-test pf-frontend --build-arg run=test
 ```
 If anything goes wrong with Jest, run `jest --clearCache`
 
 ### Compiles, minifies and serves for production
 ```
-sudo docker run -it -p 8080:8080 --rm --name pf-frontend --build-arg run=build
+sudo docker run -it -p 8080:8080 --rm --name pf-frontend-build pf-frontend --build-arg run=build
 ```
 
 Disclaimer: warnings about core-js version are shown when running some commands, it's actually a Vue-CLI error and it was fixed 12 hours ago in 3.5.2 
