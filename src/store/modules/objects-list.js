@@ -35,7 +35,7 @@ const initialState = () => ({ // TODO: improve state structure and refactor
   pagination: {
     current: 1,
     totalObjects: 1,
-    totalPages: 3,
+    totalPages: 1,
     limit: 10 // TODO: set by the user
   },
   pollingInterval: 10000
