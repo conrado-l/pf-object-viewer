@@ -1,7 +1,6 @@
 import types from './objects-list.mutations'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
-import { generateURLQueryFromObject } from '@/utils/url'
 
 // Keep the initial state in case we need to reset the store, when a component is destroyed for example.
 const initialState = () => ({ // TODO: improve state structure and refactor
@@ -84,34 +83,6 @@ const getters = {
    */
   getPollingInterval (state) {
     return state.pollingInterval
-  },
-  /**
-   * Generates an object containing the current pagination and the enabled sorting/filter settings.
-   * @param {object} state
-   */
-  APIRequestsSettings (state) { // TODO: improve it by not using a getter for this
-    let params = {}
-
-    params._page = state.pagination.current
-    params._limit = state.pagination.limit
-
-    if (state.sorting.selected) {
-      params._sort = state.sorting.selected
-    }
-
-    if (state.filters.byTerm.selected && state.filters.byTerm.search) { // Filter selected, search by filter
-      params[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
-    }
-
-    if (!state.filters.byTerm.selected && state.filters.byTerm.search) { // No filter selected, full-text search
-      params.q = state.filters.byTerm.search
-    }
-
-    if (state.filters.byAvailability.selected) {
-      params.available = state.filters.byAvailability.selected
-    }
-
-    return params
   }
 }
 
@@ -159,34 +130,60 @@ const mutations = {
    * @param {string} totalObjects - Total objects count.
    */
   [types.SET_PAGINATION_SETTINGS] (state, { totalPages, totalObjects }) {
-    state.pagination.totalPages = Math.ceil(totalPages / state.pagination.limit) // Should be provided by the API
-    state.pagination.totalObjects = totalObjects ? Number(totalObjects) : state.totalObjects // Should be provided by the API
+    state.pagination.totalPages = totalPages
+    state.pagination.totalObjects = totalObjects
   }
 }
 
 const actions = {
   /**
    * Fetches the objects
+   * @param state
    * @param commit
    * @param dispatch
    * @param getters
    */
-  fetchObjects ({ commit, dispatch, getters }) {
+  fetchObjects ({ state, commit, dispatch, getters }) {
     const loaderName = loaders.objectsList.FETCH_OBJECTS
 
     return new Promise((resolve, reject) => {
       dispatch('wait/start', loaderName, { root: true }) // vue-wait plugin
 
-      const serializedQuery = generateURLQueryFromObject(getters.APIRequestsSettings) // TODO: improve
+      // API request params
+      let params = {}
 
-      const URL = `/objects${serializedQuery}`
+      // Page
+      params._page = state.pagination.current
 
-      get(URL)
+      // Limit
+      params._limit = state.pagination.limit
+
+      // Sorting
+      if (state.sorting.selected) {
+        params._sort = state.sorting.selected.join(',') // TODO: create axios serializer to convert arrays to joined strings
+      }
+
+      // Filter selected, search by filter
+      if (state.filters.byTerm.selected && state.filters.byTerm.search) {
+        params[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
+      }
+
+      // No filter selected, full-text search
+      if (!state.filters.byTerm.selected && state.filters.byTerm.search) {
+        params.q = state.filters.byTerm.search
+      }
+
+      // Availability filter
+      if (state.filters.byAvailability.selected) {
+        params.available = state.filters.byAvailability.selected
+      }
+
+      get('/objects', params)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data)
           commit(types.SET_PAGINATION_SETTINGS, {
-            totalObjects: res.data.length,
-            totalPages: res.headers['x-total-count']
+            totalObjects: res.headers['x-total-count'],
+            totalPages: Math.ceil(res.headers['x-total-count'] / state.pagination.limit) // Should be provided by the API
           })
           resolve()
         })

@@ -1,13 +1,17 @@
-# TODO: improve the whole file and build/test logic
-ARG run="serve"
-
 # build stage
 FROM node:lts-alpine as build-stage
+
+# Create app directory
 WORKDIR /app
-COPY package.json ./
-RUN yarn cache clean
-RUN yarn install --verbose
+
+# Copy data
 COPY . .
 
-RUN if [ "$run" = "test" ] ; then yarn run test:unit; else yarn run serve; fi
+# Give execution permission
+RUN chmod +x docker-entrypoint.sh
+
+# Use docker-entrypoint as entrypoint
+ENTRYPOINT ["./docker-entrypoint.sh"]
+
+# Expose the port
 EXPOSE 8080

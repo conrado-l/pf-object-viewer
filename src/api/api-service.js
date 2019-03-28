@@ -5,10 +5,11 @@
 /**
  * Sends a GET request
  * @param {string} url
+ * @param {object} params
  * @returns {Promise<any>}
  */
-export function get (url) {
-  return window.axios.get(url)
+export function get (url, params) {
+  return window.axios.get(url, { params: { ...params } })
 }
 
 /**

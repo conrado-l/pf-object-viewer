@@ -121,15 +121,15 @@ sudo docker build -t pf-frontend .
 
 ### Run unit tests
 ```
-sudo docker build -t pf-frontend-tests . --build-arg run=test
-sudo docker run -it -p 8080:8080 --rm --name pf-frontend-tests-v1 pf-frontend-tests
+sudo docker build -t pf-frontend .
+sudo docker run -it --rm -e ENVIRONMENT=test --name pf-frontend-app pf-frontend
 ```
 If anything goes wrong with Jest, run `jest --clearCache`
 
 ### Serves development server
 ```
-sudo docker build -t pf-frontend-app . --build-arg run=serve
-sudo docker run -it -p 8080:8080 --rm --name pf-frontend-app-v1 pf-frontend-app
+sudo docker build -t pf-frontend .
+sudo docker run -it --rm -e ENVIRONMENT=serve --name pf-frontend-app pf-frontend
 ```
 
 Available at: `http://localhost:8080`
