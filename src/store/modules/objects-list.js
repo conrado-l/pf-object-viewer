@@ -99,7 +99,7 @@ const getters = {
       params._sort = state.sorting.selected
     }
 
-    if (state.filters.byTerm.selected && state.filters.byTerm.search) { // Filter selected, search by flter
+    if (state.filters.byTerm.selected && state.filters.byTerm.search) { // Filter selected, search by filter
       params[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
     }
 
