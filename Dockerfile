@@ -4,6 +4,8 @@ FROM node:lts-alpine as build-stage
 # Create app directory
 WORKDIR /app
 
+RUN yarn install
+
 # Copy data
 COPY . .
 

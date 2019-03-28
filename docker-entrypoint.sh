@@ -1,10 +1,5 @@
 #!/bin/sh
 
-echo "------------------------------- Installing dependencies -------------------------------"
-
-yarn install
-
-echo "------------------------------- Starting server-------------------------------"
 if [ "$ENVIRONMENT" == "serve" ]
 then
 echo "------------------------------- Starting development server-------------------------------"

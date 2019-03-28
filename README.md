@@ -15,18 +15,18 @@ you an also compare rows values. References: https://ux.stackexchange.com/questi
 given the complexities involved in handling the model: filters, sortings, searching and pagination. I also came up with
 2 other ideas, because this project and job is really important for me, and I wanted to think and have alternatives. The 2 ideas
 consisted in: 
-1) An objects list component wich held the state locally and used just the objects from Vuex. This component
+    1) An objects list component wich held the state locally and used just the objects from Vuex. This component
 wasn't so good because having the whole model in the component was really messy, the component used Vuetify's component separatly.
-2) The other component was an object list but also another component wich was a table. This table had the ability to
+    2) The other component was an object list but also another component wich was a table. This table had the ability to
 do everything, you could add inputs dynamically on the fly and it dynamically computed the component's type using the
 "is:" and dynamic attributes with v-bind:="{}". It was pretty fun and seemed like a good idea, but the API/props
 ended up being too big and too broad, the abstraction was too much and the component had more responsabilities than it should.
 
-3) Finally I went for my first approach, using Vuex for managing the whole state and settings, and using Vuetify components
+     Finally I went for my first approach, using Vuex for managing the whole state and settings, and using Vuetify components
 separatly. I think using Vuetify components without creating a new abstraction is good because they are modular and every component
 has a single responsability: inputs, pagination and tables.
 
-You can check the code for the other 2 ideas in the other branch, called `experiments`.
+    You can check the code for the other 2 ideas in the other branch, called `experiments`.
 
 * The most important thing I think is that I took the URL as the single source of truth, I think it's the best way to 
 have a one-way data flow. Every input pushes a new route to the router and then the application will hydrate the settings 
@@ -87,15 +87,16 @@ rm -f package-lock.json
 
 ### Misc
 * Why it's great to use data-test attributes for testing, ref may change with the implementation: 
- https://medium.com/@colecodes/test-your-dom-with-data-attributes-44fccc43ed4b  
- https://kentcdodds.com/blog/making-your-ui-tests-resilient-to-change     
+    * https://medium.com/@colecodes/test-your-dom-with-data-attributes-44fccc43ed4b  
+    
+    * https://kentcdodds.com/blog/making-your-ui-tests-resilient-to-change     
  
 * Great and funny video (700+ pages presentation) about mock testing with Justin Searls: https://www.youtube.com/watch?v=Af4M8GMoxi4                                  
 
 * I learned about how some things worked in Vuetify by looking at their tests:
 https://github.com/vuetifyjs/vuetify/tree/master/packages/vuetify/test/unit/components
 
-While I was doing this project, the new vue-dev-tools 5.0 version came out, what a great time to be alive! (`and to use VueJS`)
+* While I was doing this project, the new vue-dev-tools 5.0 version came out, what a great time to be alive! (`and to use VueJS`)
 
 ### JSON Server
 
@@ -116,28 +117,24 @@ It will listen in port 3000.
 
 ### Container build
 ```
-sudo docker build -t pf-frontend .
+sudo docker build -t pf-frontend . 
 ```
 
 ### Run unit tests
 ```
-sudo docker build -t pf-frontend .
-sudo docker run -it --rm -e ENVIRONMENT=test --name pf-frontend-app pf-frontend
+sudo docker run -it --rm -p 8080:8080 -e ENVIRONMENT=test --name pf-frontend-tests pf-frontend
 ```
 If anything goes wrong with Jest, run `jest --clearCache`
 
 ### Serves development server
 ```
-sudo docker build -t pf-frontend .
-sudo docker run -it --rm -e ENVIRONMENT=serve --name pf-frontend-app pf-frontend
+sudo docker run -it --rm -p 8080:8080 -e ENVIRONMENT=serve --name pf-frontend-app pf-frontend
 ```
 
 Available at: `http://localhost:8080`
 
 Disclaimer: warnings about core-js version are shown when running some commands, it's actually a Vue-CLI error and it was fixed 12 hours ago in 3.5.2 
             (I'm using 3.5.1 and I don't wanna risk a dirty update): https://github.com/vuejs/vue-cli/issues/3695
-
-Given that I'm not Docker expert (yet), the tests (once they pass) will try to serve and it will fail. I'm working on it.
 
 # Local setup (no Docker)
 ```
