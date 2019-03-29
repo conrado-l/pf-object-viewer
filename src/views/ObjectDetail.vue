@@ -1,6 +1,7 @@
 <template>
   <v-layout>
     <v-flex xs12 md4 offset-md4>
+      <!-- Card detail -->
       <card-detail
               title="Object detail"
               :items="objectDetail"
@@ -9,9 +10,13 @@
               error-message="An error has occurred with the object detail."
       >
       </card-detail>
+      <!---->
+
+      <!-- Retry button -->
       <v-flex v-if="error" text-xs-center>
         <v-btn color="info" @click="fetchObjectDetail">Retry</v-btn>
       </v-flex>
+      <!---->
     </v-flex>
   </v-layout>
 </template>
@@ -97,7 +102,8 @@ export default {
     ])
   },
   /**
-   * Resets the store when the component is about the be destroyed to avoid showing old data when fetching new one.
+   * Resets the store when the component is about the be destroyed to avoid showing old data when the component is
+   * rendered again for another object for example.
    */
   beforeDestroy () {
     this.$store.dispatch('objectDetail/resetStore')

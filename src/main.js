@@ -10,7 +10,7 @@ import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
-/** Plugins */
+/** Plugins **/
 Vue.use(VueWait)
 Vue.use(VueMoment)
 
@@ -26,7 +26,7 @@ Vue.use(VueMoment)
  Use a file like ./warning-handler.js
 } */
 
-/** Vue instance */
+/** Vue instance **/
 new Vue({
   router,
   store,
