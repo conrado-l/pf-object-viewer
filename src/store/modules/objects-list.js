@@ -1,6 +1,7 @@
 import types from './objects-list.mutations'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
+import { arrayIncludesArrayByProperty, hasPropertyValueInArray } from '@/utils/arrays'
 
 // Keep the initial state in case we need to reset the store, when a component is destroyed for example.
 const initialState = () => ({ // TODO: improve state structure and refactor
@@ -34,8 +35,8 @@ const initialState = () => ({ // TODO: improve state structure and refactor
   },
   pagination: {
     current: 1,
-    totalObjects: 1,
-    totalPages: 3,
+    totalObjects: 0,
+    totalPages: 0,
     limit: 10 // TODO: set by the user
   },
   pollingInterval: 10000
@@ -106,24 +107,6 @@ const mutations = {
     state.objects = objects
   },
   /**
-   * Sets the pagination, sorting and filter settings.
-   * @param {object} state - Vuex state.
-   * @param {object} settings - Settings
-   * @param {string} [settings.search] - Filter term
-   * @param {string} [settings.filterType] - Filter type
-   * @param {string} [settings.sortBy] - Sorting type
-   * @param {string} [settings.available] - Availability filter
-   * @param {string} [settings.page] - Page number
-   * Consideration: add a mutation for every object property assignment
-   */
-  [types.SET_SETTINGS] (state, { search, page, filterType, sortBy, available }) { // TODO: check if URL filter/sort is valid
-    state.filters.byTerm.search = search || ''
-    state.filters.byTerm.selected = filterType || ''
-    state.filters.byAvailability.selected = available || ''
-    state.pagination.current = page ? Number(page) : state.pagination.current
-    state.sorting.selected = sortBy ? sortBy.toString().split(',') : '' // TODO: improve
-  },
-  /**
    * Sets the total pages for pagination.
    * @param {object} state - Vuex state.
    * @param {string} totalPages - Total page count.
@@ -132,6 +115,54 @@ const mutations = {
   [types.SET_PAGINATION_SETTINGS] (state, { totalPages, totalObjects }) {
     state.pagination.totalPages = totalPages
     state.pagination.totalObjects = totalObjects
+  },
+  /**
+   * Validates and sets the search filter.
+   * @param {object} state - Vuex state.
+   * @param {string} filter - Filter type
+   */
+  [types.SET_FILTER_BY] (state, filter = '') {
+    state.filters.byTerm.selected = hasPropertyValueInArray(filter, state.filters.byTerm.options, 'value')
+      ? filter
+      : ''
+  },
+  /**
+   * Validates and sets the availability filter.
+   * @param {object} state - Vuex state.
+   * @param {string} available - Availability
+   */
+  [types.SET_AVAILABILITY_FILTER] (state, available = '') {
+    state.filters.byAvailability.selected = hasPropertyValueInArray(available, state.filters.byAvailability.options, 'value')
+      ? available
+      : ''
+  },
+  /**
+   * Validates and sets the current page.
+   * @param {object} state - Vuex state.
+   * @param {string|number} page - Current page
+   */
+  [types.SET_CURRENT_PAGE] (state, page = '') {
+    const parsedValue = Number(page)
+
+    state.pagination.current = parsedValue > 0 ? parsedValue : state.pagination.current
+  },
+  /**
+   * Validates and sets the sorting.
+   * @param {object} state - Vuex state.
+   * @param {string} sorting - Sorting
+   */
+  [types.SET_SORT_BY] (state, sorting = '') {
+    const rawArrayValues = sorting.toString().split(',')
+
+    state.sorting.selected = arrayIncludesArrayByProperty(rawArrayValues, state.sorting.options, 'value')
+  },
+  /**
+   * Sets current filter.
+   * @param {object} state - Vuex state.
+   * @param {string} search - Search term
+   */
+  [types.SET_SEARCH_TERM] (state, search = '') {
+    state.filters.byTerm.search = search
   }
 }
 
@@ -147,38 +178,39 @@ const actions = {
     const loaderName = loaders.objectsList.FETCH_OBJECTS
 
     return new Promise((resolve, reject) => {
-      dispatch('wait/start', loaderName, { root: true }) // vue-wait plugin
+      // Indicates the start of the fetching operation to the whole application (vue-wait plugin)
+      dispatch('wait/start', loaderName, { root: true })
 
-      // API request params
-      let params = {}
+      // API request settings
+      let settings = {}
 
       // Page
-      params._page = state.pagination.current
+      settings._page = state.pagination.current
 
       // Limit
-      params._limit = state.pagination.limit
+      settings._limit = state.pagination.limit
 
       // Sorting
-      if (state.sorting.selected) {
-        params._sort = state.sorting.selected.join(',') // TODO: create axios serializer to convert arrays to joined strings
+      if (state.sorting.selected.length) {
+        settings._sort = state.sorting.selected.join(',') // TODO: create axios serializer to convert arrays to joined strings
       }
 
-      // Filter selected, search by filter
+      // Filter is selected, search by filter
       if (state.filters.byTerm.selected && state.filters.byTerm.search) {
-        params[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
+        settings[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
       }
 
-      // No filter selected, full-text search
+      // No filter is selected, full-text search
       if (!state.filters.byTerm.selected && state.filters.byTerm.search) {
-        params.q = state.filters.byTerm.search
+        settings.q = state.filters.byTerm.search
       }
 
       // Availability filter
       if (state.filters.byAvailability.selected) {
-        params.available = state.filters.byAvailability.selected
+        settings.available = state.filters.byAvailability.selected
       }
 
-      get('/objects', params)
+      get('/objects', settings)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data)
           commit(types.SET_PAGINATION_SETTINGS, {
@@ -198,15 +230,19 @@ const actions = {
    * Sets the settings for pagination, sorting and filtering.
    * @param commit
    * @param {object} settings - Settings
-   * @param {string} [settings.search] - Filter term
-   * @param {string} [settings.filterType] - Filter type
-   * @param {string} [settings.sortBy] - Sorting type
-   * @param {string} [settings.available] - Availability filter
-   * @param {string} [settings.page] - Page number
+   * @param {string} search - Filter term
+   * @param {string} filterBy - Filter type
+   * @param {string} sortBy- Sorting type
+   * @param {string} available - Availability filter
+   * @param {string} page - Page number
    * Consideration: the mutation/s could be called without an action, depends on the person.
    */
-  applySettings ({ commit }, settings) {
-    commit(types.SET_SETTINGS, settings)
+  applySettings ({ commit }, { search, filterBy, sortBy, available, page }) {
+    commit(types.SET_SEARCH_TERM, search)
+    commit(types.SET_FILTER_BY, filterBy)
+    commit(types.SET_SORT_BY, sortBy)
+    commit(types.SET_AVAILABILITY_FILTER, available)
+    commit(types.SET_CURRENT_PAGE, page)
   },
   /**
    * Resets the store's state.

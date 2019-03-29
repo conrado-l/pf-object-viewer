@@ -96,7 +96,7 @@ describe('ObjectsList.vue', () => {
       query: {
         page: 1,
         search: 'pf',
-        filterType: 'name,id',
+        filterBy: 'name,id',
         sortBy: 'id',
         available: 'yes'
       }
@@ -105,7 +105,7 @@ describe('ObjectsList.vue', () => {
     const parsedSettings = {
       page: 1,
       search: 'pf',
-      filterType: ['name', 'id'],
+      filterBy: ['name', 'id'],
       sortBy: 'id',
       available: 'yes'
     }
@@ -156,7 +156,7 @@ describe('ObjectsList.vue', () => {
     wrapper.find('[data-test="input-sorting"]').trigger('input')
 
     expect(updateRoute).toHaveBeenNthCalledWith(1, 'search', 'fp')
-    expect(updateRoute).toHaveBeenNthCalledWith(2, 'filterType', 'name')
+    expect(updateRoute).toHaveBeenNthCalledWith(2, 'filterBy', 'name')
     expect(updateRoute).toHaveBeenNthCalledWith(3, 'available', 'no')
     expect(updateRoute).toHaveBeenNthCalledWith(4, 'sortBy', 'name')
   })
@@ -170,7 +170,7 @@ describe('ObjectsList.vue', () => {
       query: {
         page: 1,
         search: 'pf',
-        filterType: 'name'
+        filterBy: 'name'
       }
     }
 
@@ -182,7 +182,7 @@ describe('ObjectsList.vue', () => {
     expect(router.push).toHaveBeenCalledWith({
       name: 'objects-list',
       query: {
-        filterType: 'name',
+        filterBy: 'name',
         page: 1,
         search: 'updatedPf'
       }
@@ -198,7 +198,7 @@ describe('ObjectsList.vue', () => {
       query: {
         page: 1,
         search: 'pf',
-        filterType: 'name'
+        filterBy: 'name'
       }
     }
 
@@ -210,7 +210,7 @@ describe('ObjectsList.vue', () => {
     expect(router.push).toHaveBeenCalledWith({
       name: 'objects-list',
       query: {
-        filterType: 'name',
+        filterBy: 'name',
         page: 1
       }
     })
@@ -225,13 +225,13 @@ describe('ObjectsList.vue', () => {
       query: {
         page: 1,
         search: 'pf',
-        filterType: 'name'
+        filterBy: 'name'
       }
     }
 
     const wrapper = factoryMount({ route, router })
 
-    wrapper.vm.updateRoute('filterType', [])
+    wrapper.vm.updateRoute('filterBy', [])
 
     expect(router.push).toHaveBeenCalledTimes(1)
     expect(router.push).toHaveBeenCalledWith({

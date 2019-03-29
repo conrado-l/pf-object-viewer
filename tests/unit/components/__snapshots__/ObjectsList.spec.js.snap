@@ -141,15 +141,15 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
       <div
         class="v-card__title headline"
       >
-        
+
         Objects List
-      
+
       </div>
-       
+
       <div
         class="spacer"
       />
-       
+
       <div
         class="layout justify-center"
       >
@@ -212,7 +212,7 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
             </div>
           </div>
         </div>
-         
+
         <div
           class="flex xs12 md6 mx-2"
         >
@@ -249,7 +249,7 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
                       aria-readonly="false"
                       autocomplete="on"
                       data-test="input-filter-type"
-                      name="filterType"
+                      name="filterBy"
                       readonly="readonly"
                       type="text"
                     />
@@ -302,7 +302,7 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
           </div>
         </div>
       </div>
-       
+
       <div
         class="layout justify-center"
       >
@@ -387,7 +387,7 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
             </div>
           </div>
         </div>
-         
+
         <div
           class="flex xs12 md6 mx-2"
         >
@@ -470,7 +470,7 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
           </div>
         </div>
       </div>
-       
+
       <div>
         <div
           class="v-table__overflow"
@@ -543,37 +543,37 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
                 <td
                   data-test="item-cell"
                 >
-                  
+
               1
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               Shirt
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               An amazing blue shirt
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               clothing
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               No
-            
+
                 </td>
               </tr>
               <tr
@@ -583,37 +583,37 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
                 <td
                   data-test="item-cell"
                 >
-                  
+
               2
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               Shirt
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               An amazing red shirt
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               clothing
-            
+
                 </td>
                 <td
                   data-test="item-cell"
                 >
-                  
+
               Yes
-            
+
                 </td>
               </tr>
             </tbody>
@@ -621,7 +621,7 @@ exports[`ObjectsList.vue should render the component correctly 1`] = `
         </div>
       </div>
     </div>
-     
+
     <div
       class="layout align-center justify-center my-2"
     >

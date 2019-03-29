@@ -26,9 +26,9 @@
 
           <v-flex xs12 md6 mx-2>
             <v-select
-                    name="filterType"
+                    name="filterBy"
                     label="Search by"
-                    v-model="filterType"
+                    v-model="filterBy"
                     :items="getFilters.byTerm.options"
                     item-text="description"
                     item-value="value"
@@ -122,6 +122,12 @@
  * It also enables other components (if that was the case) to access the objects, pagination, filters and sorting.
  * In my opinion Vuex (sometimes) should be used in medium to large apps for avoiding to refactor from local state to Vuex later.
  * Vuex is not a silver bullet, and it's not always the right tool, but "Use Vuex before is too late".
+ */
+
+/**
+ * A paginated table rendering the objects data with the possibility to search, filter and sort.
+ * It polls/refreshes data periodically automatically.
+ *
  */
 import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
@@ -236,12 +242,12 @@ export default {
         }
       }
     },
-    filterType: {
+    filterBy: {
       get () {
         return this.getFilters.byTerm.selected
       },
       set (value) {
-        this.updateRoute('filterType', value)
+        this.updateRoute('filterBy', value)
       }
     },
     filterAvailable: {
