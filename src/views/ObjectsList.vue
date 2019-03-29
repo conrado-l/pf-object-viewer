@@ -194,7 +194,7 @@ export default {
       // If the value wasn't cleared, add/update it to the new query
       // If the value was cleared and the current route has it set, delete it from the new query
       if (parsedValue) {
-        newQuery[param] = value
+        newQuery[param] = parsedValue
       } else if (!parsedValue && newQuery.hasOwnProperty(param)) {
         delete newQuery[param]
       }

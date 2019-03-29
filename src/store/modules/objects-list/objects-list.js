@@ -10,7 +10,7 @@ const initialState = () => ({ // TODO: improve state structure and refactor
   search: '',
   filters: {
     byTerm: {
-      selected: '',
+      selected: [],
       options: [
         { value: 'name', description: 'Name' },
         { value: 'description', description: 'Description' },
@@ -156,7 +156,7 @@ const mutations = {
     state.objects = objects
   },
   /**
-   * Sets the total pages for pagination.
+   * Sets the total pages and total objects for pagination.
    * @param {object} state - Vuex state.
    * @param {string} totalPages - Total page count.
    * @param {string} totalObjects - Total objects count.
@@ -214,6 +214,47 @@ const mutations = {
     state.search = search
   }
 }
+/**
+ * Generates the object for fetching the objects based on the settings.
+ * @param {object} settings
+ * @param {number} settings.page
+ * @param {number} settings.limit
+ * @param {string} settings.filter
+ * @param {array}  settings.sorting
+ * @param {string} settings.available
+ * @param {string} settings.search
+ */
+const generateFetchObjectsParams = ({ page, limit, filter, sorting, available, search }) => {
+  let params = {}
+
+  // Page
+  params._page = page
+
+  // Limit
+  params._limit = state.limit
+
+  // Sorting
+  if (sorting.length) {
+    params._sort = sorting.join(',') // TODO: create axios serializer to convert arrays to joined strings (json-server case)
+  }
+
+  // Filter is selected, search by filter
+  if (filter && search) {
+    params[`${filter}_like`] = search
+  }
+
+  // No filter is selected, full-text search
+  if (!filter && search) {
+    params.q = search
+  }
+
+  // Availability filter
+  if (available) {
+    params.available = available
+  }
+
+  return params
+}
 
 const actions = {
   /**
@@ -230,36 +271,18 @@ const actions = {
       // Indicates the start of the fetching operation to the whole application (vue-wait plugin)
       dispatch('wait/start', loaderName, { root: true })
 
-      // API request settings
-      let settings = {}
-
-      // Page
-      settings._page = state.pagination.current
-
-      // Limit
-      settings._limit = state.pagination.limit
-
-      // Sorting
-      if (state.sorting.selected.length) {
-        settings._sort = state.sorting.selected.join(',') // TODO: create axios serializer to convert arrays to joined strings
+      const settings = {
+        filter: state.filters.byTerm.selected,
+        available: state.filters.byAvailability.selected,
+        sorting: state.sorting.selected,
+        search: state.search,
+        page: state.pagination.current,
+        limit: state.pagination.limit
       }
 
-      // Filter is selected, search by filter
-      if (state.filters.byTerm.selected && state.search) {
-        settings[`${state.filters.byTerm.selected}_like`] = state.search
-      }
+      const params = generateFetchObjectsParams(settings)
 
-      // No filter is selected, full-text search
-      if (!state.filters.byTerm.selected && state.search) {
-        settings.q = state.search
-      }
-
-      // Availability filter
-      if (state.filters.byAvailability.selected) {
-        settings.available = state.filters.byAvailability.selected
-      }
-
-      get('/objects', settings)
+      get('/objects', params)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data)
           commit(types.SET_PAGINATION_SETTINGS, {
