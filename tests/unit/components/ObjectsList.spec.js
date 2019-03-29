@@ -309,4 +309,5 @@ describe('ObjectsList.vue', () => {
   })
 
   // TODO: test polling interval fetching objects
+  // TODO: test when fetchObjects promise fail, it should show the toast
 })

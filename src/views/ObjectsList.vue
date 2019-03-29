@@ -29,7 +29,7 @@
                     name="filterBy"
                     label="Search by"
                     v-model="filterBy"
-                    :items="getFilters.byTerm.options"
+                    :items="getFiltersOptions"
                     item-text="description"
                     item-value="value"
                     clearable
@@ -44,7 +44,7 @@
                     name="available"
                     label="Available"
                     v-model="filterAvailable"
-                    :items="getFilters.byAvailability.options"
+                    :items="getAvailabilityFilterOptions"
                     item-text="description"
                     item-value="value"
                     clearable
@@ -57,13 +57,12 @@
                     name="sortBy"
                     label="Sort by"
                     v-model="sorting"
-                    :items="getSorting.options"
+                    :items="getSortingOptions"
                     item-text="description"
                     item-value="value"
                     clearable
                     multiple
                     data-test="input-sorting"
-
             >
             </v-select>
           </v-flex>
@@ -103,7 +102,7 @@
       <v-layout align-center justify-center my-2>
         <v-pagination
                 v-model="currentPage"
-                :length="getPagination.totalPages"
+                :length="getTotalPages"
                 :disabled="isLoading"
                 circle
                 data-test="input-pagination"
@@ -126,7 +125,7 @@
 
 /**
  * A paginated table rendering the objects data with the possibility to search, filter and sort.
- * It polls/refreshes data periodically automatically.
+ * It polls/refreshes data periodically.
  */
 import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
@@ -142,12 +141,7 @@ export default {
       title: 'Objects List',
       pollingInterval: null,
       headers: [
-        {
-          text: 'ID',
-          align: 'left',
-          sortable: false,
-          value: 'id'
-        },
+        { text: 'ID', align: 'left', sortable: false, value: 'id' },
         { text: 'Name', sortable: false, value: 'name' },
         { text: 'Description', sortable: false, value: 'description' },
         { text: 'Type', sortable: false, value: 'type' },
@@ -162,7 +156,7 @@ export default {
     /**
      * Sets the pagination, sorting, and filtering settings.
      * Called from the $route watch.
-     * @param {object} settings
+     * @param {object} settings Parsed settings
      */
     applySettings (settings) {
       this.$store.dispatch('objectsList/applySettings', settings)
@@ -231,7 +225,7 @@ export default {
      **/
     filterSearch: {
       get () {
-        return this.getFilters.byTerm.search
+        return this.getSearch
       },
       set (value) {
         this.debounceSearch(value)
@@ -239,7 +233,7 @@ export default {
     },
     filterBy: {
       get () {
-        return this.getFilters.byTerm.selected
+        return this.getFilterSelected
       },
       set (value) {
         this.updateRoute('filterBy', value)
@@ -247,7 +241,7 @@ export default {
     },
     filterAvailable: {
       get () {
-        return this.getFilters.byAvailability.selected
+        return this.getAvailabilityFilterSelected
       },
       set (value) {
         this.updateRoute('available', value)
@@ -255,7 +249,7 @@ export default {
     },
     sorting: {
       get () {
-        return this.getSorting.selected
+        return this.getSortingSelected
       },
       set (value) {
         this.updateRoute('sortBy', value)
@@ -263,7 +257,7 @@ export default {
     },
     currentPage: {
       get () {
-        return this.getPagination.current
+        return this.getCurrentPage
       },
       set (value) {
         this.updateRoute('page', value)
@@ -297,9 +291,15 @@ export default {
     },
     ...mapGetters('objectsList', [
       'getObjects',
-      'getPagination',
-      'getFilters',
-      'getSorting',
+      'getTotalPages',
+      'getCurrentPage',
+      'getSearch',
+      'getFiltersOptions',
+      'getFilterSelected',
+      'getSortingOptions',
+      'getSortingSelected',
+      'getAvailabilityFilterOptions',
+      'getAvailabilityFilterSelected',
       'getPollingInterval'
     ])
   },

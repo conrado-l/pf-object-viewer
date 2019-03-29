@@ -100,7 +100,7 @@ export default {
    * Resets the store when the component is about the be destroyed to avoid showing old data when fetching new one.
    */
   beforeDestroy () {
-    this.$store.commit('objectDetail/reset')
+    this.$store.dispatch('objectDetail/resetStore')
   }
 }
 </script>

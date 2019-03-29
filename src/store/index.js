@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import objectsList from './modules/objects-list'
-import objectDetail from './modules/object-detail'
+import objectsList from './modules/objects-list/objects-list'
+import objectDetail from './modules/object-detail/object-detail'
 
 Vue.use(Vuex)
 

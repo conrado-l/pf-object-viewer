@@ -1,7 +1,8 @@
 /**
  * Generates a URL query based on the object properties
- * Example: {value: 1, name: 'George'} --> '?value=1&name=George'
  * @param {object} paramsObject
+ * @example {value: 1, name: 'George'} --> '?value=1&name=George'
+ * @return {string}
  */
 import { hasCommaDelimitator } from '@/utils/strings'
 
@@ -13,6 +14,7 @@ export function generateURLQueryFromObject (paramsObject) {
 /**
  * Returns an object in which every property with multiple values separated by a comma, become a split array.
  * @param {object} query
+ * @example {sort: description,name} = {sort: ['description','name']}
  * @returns {object}
  */
 export function parseRouteQuery (query) {

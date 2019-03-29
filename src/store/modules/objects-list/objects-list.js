@@ -1,4 +1,5 @@
 import types from './objects-list.mutations'
+import commonTypes from '@/store/common/common.mutation'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
 import { arrayIncludesArrayByProperty, hasPropertyValueInArray } from '@/utils/arrays'
@@ -6,9 +7,9 @@ import { arrayIncludesArrayByProperty, hasPropertyValueInArray } from '@/utils/a
 // Keep the initial state in case we need to reset the store, when a component is destroyed for example.
 const initialState = () => ({ // TODO: improve state structure and refactor
   objects: [],
+  search: '',
   filters: {
     byTerm: {
-      search: '', // Search term filter
       selected: '',
       options: [
         { value: 'name', description: 'Name' },
@@ -46,7 +47,7 @@ const state = initialState()
 
 const getters = {
   /**
-   * Gets the objects
+   * Gets the objects.
    * @param state
    * @returns {array}
    */
@@ -54,31 +55,79 @@ const getters = {
     return state.objects
   },
   /**
-   * Gets the pagination settings
+   * Gets the search term.
+   * @param state
+   * @returns {array}
+   */
+  getSearch (state) {
+    return state.search
+  },
+  /**
+   * Gets the total pages.
    * @param state
    * @returns {number}
    */
-  getPagination (state) {
-    return state.pagination
+  getTotalPages (state) {
+    return state.pagination.totalPages
   },
   /**
-   * Gets the filters settings
+   * Gets the current pages.
    * @param state
    * @returns {number}
    */
-  getFilters (state) {
-    return state.filters
+  getCurrentPage (state) {
+    return state.pagination.current
   },
   /**
-   * Gets the filters settings
+   * Gets the filters options.
    * @param state
-   * @returns {number}
+   * @returns {array}
    */
-  getSorting (state) {
-    return state.sorting
+  getFiltersOptions (state) {
+    return state.filters.byTerm.options
   },
   /**
-   * Gets the polling interval
+   * Gets the selected filter.
+   * @param state
+   * @returns {string}
+   */
+  getFilterSelected (state) {
+    return state.filters.byTerm.selected
+  },
+  /**
+   * Gets the sorting options.
+   * @param state
+   * @returns {array}
+   */
+  getSortingOptions (state) {
+    return state.sorting.options
+  },
+  /**
+   * Gets the selected sorting.
+   * @param state
+   * @returns {array}
+   */
+  getSortingSelected (state) {
+    return state.sorting.selected
+  },
+  /**
+   * Gets the availability filter options.
+   * @param state
+   * @returns {array}
+   */
+  getAvailabilityFilterOptions (state) {
+    return state.filters.byAvailability.options
+  },
+  /**
+   * Gets the availability selected filter.
+   * @param state
+   * @returns {string}
+   */
+  getAvailabilityFilterSelected (state) {
+    return state.filters.byAvailability.selected
+  },
+  /**
+   * Gets the polling interval.
    * @param state
    * @returns {number}
    */
@@ -92,7 +141,7 @@ const mutations = {
    * Resets the store's state
    * @param state Vuex state
    */
-  [types.RESET] (state) {
+  [commonTypes.RESET_STORE] (state) {
     const init = initialState()
     Object.keys(init).forEach(key => {
       state[key] = init[key]
@@ -142,9 +191,9 @@ const mutations = {
    * @param {string|number} page - Current page
    */
   [types.SET_CURRENT_PAGE] (state, page = '') {
-    const parsedValue = Number(page)
+    const parsedPage = Number(page)
 
-    state.pagination.current = parsedValue > 0 ? parsedValue : state.pagination.current
+    state.pagination.current = parsedPage > 0 ? parsedPage : state.pagination.current
   },
   /**
    * Validates and sets the sorting.
@@ -152,9 +201,9 @@ const mutations = {
    * @param {string} sorting - Sorting
    */
   [types.SET_SORT_BY] (state, sorting = '') {
-    const rawArrayValues = sorting.toString().split(',')
+    const rawSortingArray = sorting.toString().split(',')
 
-    state.sorting.selected = arrayIncludesArrayByProperty(rawArrayValues, state.sorting.options, 'value')
+    state.sorting.selected = arrayIncludesArrayByProperty(rawSortingArray, state.sorting.options, 'value')
   },
   /**
    * Sets current filter.
@@ -162,7 +211,7 @@ const mutations = {
    * @param {string} search - Search term
    */
   [types.SET_SEARCH_TERM] (state, search = '') {
-    state.filters.byTerm.search = search
+    state.search = search
   }
 }
 
@@ -196,13 +245,13 @@ const actions = {
       }
 
       // Filter is selected, search by filter
-      if (state.filters.byTerm.selected && state.filters.byTerm.search) {
-        settings[`${state.filters.byTerm.selected}_like`] = state.filters.byTerm.search
+      if (state.filters.byTerm.selected && state.search) {
+        settings[`${state.filters.byTerm.selected}_like`] = state.search
       }
 
       // No filter is selected, full-text search
-      if (!state.filters.byTerm.selected && state.filters.byTerm.search) {
-        settings.q = state.filters.byTerm.search
+      if (!state.filters.byTerm.selected && state.search) {
+        settings.q = state.search
       }
 
       // Availability filter
@@ -247,9 +296,10 @@ const actions = {
   /**
    * Resets the store's state.
    * @param commit
+   * TODO: extract the action and mutation to a common file for reusability
    */
   resetStore ({ commit }) {
-    commit(types.RESET)
+    commit(commonTypes.RESET_STORE)
   }
 }
 

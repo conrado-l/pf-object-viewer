@@ -5,7 +5,6 @@ const SET_FILTER_BY = 'SET_FILTER_BY'
 const SET_SORT_BY = 'SET_SORT_BY'
 const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE'
 const SET_AVAILABILITY_FILTER = 'SET_AVAILABILITY_FILTER'
-const RESET = 'RESET' // TODO: should be reused in every store, export in a common file
 
 export default {
   SET_OBJECTS,
@@ -14,6 +13,5 @@ export default {
   SET_FILTER_BY,
   SET_SORT_BY,
   SET_CURRENT_PAGE,
-  SET_AVAILABILITY_FILTER,
-  RESET
+  SET_AVAILABILITY_FILTER
 }

@@ -1,4 +1,5 @@
 import types from './object-detail.mutation'
+import commonTypes from '@/store/common/common.mutation'
 import { get } from '@/api/api-service'
 import loaders from '@/consts/loaders'
 
@@ -25,7 +26,7 @@ const mutations = {
    * Resets the store's state
    * @param state
    */
-  reset (state) {
+  [commonTypes.RESET_STORE] (state) {
     const init = initialState()
     Object.keys(init).forEach(key => {
       state[key] = init[key]
@@ -66,6 +67,14 @@ const actions = {
         })
         .finally(() => dispatch('wait/end', loaderName, { root: true }))
     })
+  },
+  /**
+   * Resets the store's state.
+   * @param commit
+   *
+   */
+  resetStore ({ commit }) {
+    commit(commonTypes.RESET_STORE)
   }
 }
 
