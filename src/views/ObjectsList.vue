@@ -127,13 +127,12 @@
 /**
  * A paginated table rendering the objects data with the possibility to search, filter and sort.
  * It polls/refreshes data periodically automatically.
- *
  */
 import { mapGetters } from 'vuex'
 import loaders from '@/consts/loaders'
 import Toast from 'vuetify-toast'
 import debounce from 'debounce'
-import { DEBOUNCE_INTERVAL } from '@/consts/inputs'
+import { INPUT_DEBOUNCE_INTERVAL } from '@/consts/inputs'
 import { parseRouteQuery } from '@/utils/url'
 
 export default {
@@ -221,7 +220,7 @@ export default {
      */
     debounceSearch: debounce(function (value) { // Can't use arrow function notation because of "this" binding
       this.updateRoute('search', value)
-    }, DEBOUNCE_INTERVAL)
+    }, INPUT_DEBOUNCE_INTERVAL)
   },
   computed: {
     /**
@@ -235,11 +234,7 @@ export default {
         return this.getFilters.byTerm.search
       },
       set (value) {
-        if (value) {
-          this.debounceSearch(value) // Debounce the route update if there is input
-        } else {
-          this.updateRoute('search', '') // Update the route immediately if the input was cleared
-        }
+        this.debounceSearch(value)
       }
     },
     filterBy: {

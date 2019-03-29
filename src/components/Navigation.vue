@@ -15,8 +15,8 @@
 
 <script>
 /**
-   * Navigation component for accessing the different sections of the application.
-   */
+ * Navigation component for accessing the different sections of the application.
+ */
 export default {
   name: 'Navigation',
   methods: {
