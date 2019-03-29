@@ -32,22 +32,17 @@ describe('ObjectsList.vue', () => {
     },
     getters: {
       'objectsList/getObjects': mockupObjects,
-      'objectsList/getFilters': {
-        byTerm: {
-          search: 'pf',
-          selected: 'id',
-          options: ['id', 'name', 'description']
-        },
-        byAvailability: {
-          selected: 'yes',
-          options: []
-        }
-      },
-      'objectsList/getPagination': '',
-      'objectsList/getSorting': {
-        selected: 'id',
-        options: []
-      },
+      'objectsList/getSearch': 'pf',
+      'objectsList/getFilterSelected': 'id',
+      'objectsList/getFiltersOptions': ['id', 'name', 'description', 'type'],
+      'objectsList/getAvailabilityFilterSelected': 'yes',
+      'objectsList/getAvailabilityFilterOptions': [],
+
+      'objectsList/getTotalPages': 2,
+      'objectsList/getCurrentPage': 1,
+      'objectsList/getSortingSelected': 'id',
+      'objectsList/getSortingOptions': ['id', 'name', 'description'],
+
       'objectsList/getPollingInterval': 10000
     }
   })

@@ -185,23 +185,23 @@ export default {
      * @param {string} value Parameter value
      */
     updateRoute (param, value) {
-      // The new query that will be pushed to the router
-      let newQuery = {}
+      // The new query that will be pushed to the router based on the current route
+      let newQuery = Object.assign({}, this.$route.query)
 
-      // Handles single and multiple value inputs (select inputs)
+      // Handle single and multiple value inputs (select inputs)
       let parsedValue = Array.isArray(value) ? value.join(',') : value
 
-      // Creates a new query object, merging the current router query and the new/updated value
-      Object.assign(newQuery, this.$route.query, { [param]: parsedValue })
+      // If the value wasn't cleared, add/update it to the new query
+      // If the value was cleared and the current route has it set, delete it from the new query
+      if (parsedValue) {
+        newQuery[param] = value
+      } else if (!parsedValue && newQuery.hasOwnProperty(param)) {
+        delete newQuery[param]
+      }
 
       // If a filter/sorting/input is changed, set the page to the first
       if (param !== 'page') {
         newQuery.page = 1
-      }
-
-      // If the param was cleared/falsy, remove it (this logic can be vastly improved by not adding it in the first place)
-      if (!parsedValue) { // TODO: improve logic
-        delete newQuery[param]
       }
 
       this.$router.push({
