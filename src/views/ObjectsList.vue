@@ -149,9 +149,6 @@ export default {
       ]
     }
   },
-  created () {
-    this.startFetchObjectPolling(this.getPollingInterval)
-  },
   methods: {
     /**
      * Sets the pagination, sorting, and filtering settings.
@@ -302,6 +299,12 @@ export default {
       'getAvailabilityFilterSelected',
       'getPollingInterval'
     ])
+  },
+  /**
+   * Start the data/objects polling when the component is created.
+   */
+  created () {
+    this.startFetchObjectPolling(this.getPollingInterval)
   },
   /**
    * When a new route is detected, the settings will be hydrated from the URL and the objects will be fetched.
