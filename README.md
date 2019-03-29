@@ -122,7 +122,7 @@ sudo docker build -t pf-frontend .
 
 ### Run unit tests
 ```
-sudo docker run -it --rm -p 8080:8080 -e ENVIRONMENT=test --name pf-frontend-tests pf-frontend
+sudo docker run -it --rm -e ENVIRONMENT=test --name pf-frontend-tests pf-frontend
 ```
 If anything goes wrong with Jest, run `jest --clearCache`
 
