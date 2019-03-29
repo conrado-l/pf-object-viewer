@@ -238,12 +238,12 @@ const generateFetchObjectsParams = ({ page, limit, filter, sorting, available, s
     params._sort = sorting.join(',') // TODO: create axios serializer to convert arrays to joined strings (json-server case)
   }
 
-  // Filter is selected, search by filter
+  // Filter is selected and there is a search term, search by that filter
   if (filter && search) {
     params[`${filter}_like`] = search
   }
 
-  // No filter is selected, full-text search
+  // No filter is selected and there is a search term, do a full-text search
   if (!filter && search) {
     params.q = search
   }
