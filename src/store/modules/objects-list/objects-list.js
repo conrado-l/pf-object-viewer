@@ -1,6 +1,6 @@
 import types from './objects-list.mutations'
 import commonTypes from '@/store/common/common.mutation'
-import { get } from '@/api/api-service'
+import APIService from '@/api/api-service'
 import loaders from '@/consts/loaders'
 import { arrayIncludesArrayByProperty, hasPropertyValueInArray } from '@/utils/arrays'
 
@@ -231,7 +231,7 @@ const generateFetchObjectsParams = ({ page, limit, filter, sorting, available, s
   params._page = page
 
   // Limit
-  params._limit = state.limit
+  params._limit = limit
 
   // Sorting
   if (sorting.length) {
@@ -282,7 +282,7 @@ const actions = {
 
       const params = generateFetchObjectsParams(settings)
 
-      get('/objects', params)
+      APIService.get('/objects', params)
         .then((res) => {
           commit(types.SET_OBJECTS, res.data)
           commit(types.SET_PAGINATION_SETTINGS, {

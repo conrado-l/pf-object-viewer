@@ -1,6 +1,6 @@
-import types from './object-detail.mutation'
+import types from './object-detail.mutations'
 import commonTypes from '@/store/common/common.mutation'
-import { get } from '@/api/api-service'
+import APIService from '@/api/api-service'
 import loaders from '@/consts/loaders'
 
 // Keep the initial state in case we need to reset the store, when a component is destroyed for example.
@@ -56,7 +56,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       const URL = `/objects/${objectId}`
 
-      get(URL)
+      APIService.get(URL)
         .then((res) => {
           commit(types.SET_OBJECT, res.data)
           resolve()

@@ -1,38 +1,52 @@
-import actions from './objects-list.actions'
-import { generateURLQueryFromObject } from '@/utils/url'
+import store from '@/store/modules/objects-list/objects-list'
+import types from '@/store/modules/objects-list/objects-list.mutations'
+import APIService from '@/api/api-service'
 
-let url = ''
-
-jest.mock('@/api/api-service.js', () => ({
-  get: (_url) => {
-    return new Promise((resolve) => {
-      url = _url
-      resolve(true)
-    })
-  }
-}))
+jest.mock('@/api/api-service')
 
 describe('fetchObjects', () => {
   it('should fetch the objects data from the API and run the correct mutation', async () => {
+    const state = {
+      filters: {
+        byTerm: {
+          selected: '15'
+        },
+        byAvailability: {
+          selected: ''
+        }
+      },
+      sorting: {
+        selected: []
+      },
+      pagination: {
+        current: 1,
+        limit: 5
+      }
+    }
     const commit = jest.fn()
-    const query = {
-      page: 1,
-      limit: 5, // TODO: set it the store only?
-      search: 'pf',
-      filterBy: 'description',
-      sortBy: 'id',
-      available: 'no'
+    const dispatch = jest.fn()
+    const response = {
+      data: ['objects'],
+      headers: {
+        'x-total-count': 10
+      }
+    }
+    const requestParams = {
+      _limit: 5,
+      _page: 1
     }
 
-    const serializedQuery = generateURLQueryFromObject(query)
+    APIService.get = jest.fn().mockImplementationOnce(() => Promise.resolve(response))
 
-    await actions.fetchObjects({ commit }, query)
+    await store.actions.fetchObjects({ state, commit, dispatch })
 
-    expect(url).toBe(`${process.env.VUE_APP_BASE_API_URL}/objects${serializedQuery}`)
-    expect(commit).toHaveBeenCalledWith('SET_OBJECTS', true)
-    expect(commit).toHaveBeenCalledWith('SET_PAGINATION_SETTINGS', { totalObjects: 10, totalPages: 2 })
+    expect(APIService.get).toHaveBeenCalledTimes(1)
+    expect(APIService.get).toHaveBeenCalledWith('/objects', requestParams)
+    expect(commit).toHaveBeenNthCalledWith(1, types.SET_OBJECTS, response.data)
+    expect(commit).toHaveBeenNthCalledWith(2, types.SET_PAGINATION_SETTINGS, { totalObjects: 10, totalPages: 2 })
   })
 })
+
 describe('applySettings', () => {
   it('should apply the settings by calling the SET_SETTINGS mutation', async () => {
     const commit = jest.fn()
@@ -45,9 +59,13 @@ describe('applySettings', () => {
       available: 'no'
     }
 
-    actions.applySettings({ commit }, settings) // Synchronous action, no need for await
+    store.actions.applySettings({ commit }, settings) // Synchronous action, no need for await
 
-    expect(commit).toHaveBeenCalledWith('SET_SETTINGS', settings)
+    expect(commit).toHaveBeenNthCalledWith(1, types.SET_SEARCH_TERM, settings.search)
+    expect(commit).toHaveBeenNthCalledWith(2, types.SET_FILTER_BY, settings.filterBy)
+    expect(commit).toHaveBeenNthCalledWith(3, types.SET_SORT_BY, settings.sortBy)
+    expect(commit).toHaveBeenNthCalledWith(4, types.SET_AVAILABILITY_FILTER, settings.available)
+    expect(commit).toHaveBeenNthCalledWith(5, types.SET_CURRENT_PAGE, settings.page)
   })
 })
 //

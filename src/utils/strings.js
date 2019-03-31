@@ -1,6 +1,7 @@
 /**
  * Checks if the string has comma delimitators.
  * @param {string} string String to be parsed
+ * @return {boolean}
  */
 export function hasCommaDelimitator (string) {
   if (typeof string === 'string' || string instanceof String) {

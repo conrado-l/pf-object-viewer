@@ -1,13 +1,5 @@
-/* eslint-disable */ // TODO: enable eslint when the API service is completely mocked
-import { get } from '@/api/api-service'
+export const get = jest.fn().mockImplementation(() => Promise.resolve({ data: 'mockData' })) // eslint-disable-line
 
-let url = ''
-
-jest.mock('../api-service.js', () => ({
-  get: (_url) => {
-    return new Promise((resolve) => {
-      url = _url
-      resolve(true)
-    })
-  }
-}))
+export default {
+  get
+}

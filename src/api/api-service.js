@@ -21,3 +21,8 @@ export function get (url, params) {
 export function post (url, params) {
   return window.axios.post(url, params)
 }
+
+export default {
+  get,
+  post
+}
