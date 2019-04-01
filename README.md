@@ -1,4 +1,4 @@
-### Trello dashboard progress
+### Trello dashboard
 https://trello.com/b/93A8QLtj/pf                           
 
 ### JSON Server
